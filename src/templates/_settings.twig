@@ -30,12 +30,13 @@
             <span style="font-size: 18px;">🛠️</span> Editor Configurations
         </h3>
 
-        {{ forms.numberField({
+        {{ forms.textField({
             label: "Max Nesting Depth"|t('tka-navigation'),
             instructions: "The maximum depth navigation links can be nested. Set to 0 or leave empty for unlimited nesting depth (e.g. 1 allows only root nodes)."|t('tka-navigation'),
             id: 'maxDepth',
             name: 'maxDepth',
             value: settings.maxDepth,
+            type: 'number',
             min: 0,
             warning: (settings.maxDepth == 1) ? "Nesting is completely disabled."|t('tka-navigation') : null,
             errors: settings.getErrors('maxDepth'),
@@ -81,12 +82,13 @@
         }) }}
 
         <div id="cacheDuration-wrapper" style="margin-top: 20px; {% if not settings.enableCache %}display: none;{% endif %}">
-            {{ forms.numberField({
+            {{ forms.textField({
                 label: "Cache Duration (seconds)"|t('tka-navigation'),
                 instructions: "Specify the TTL in seconds. Enter 0 or leave empty to cache permanently (automatically cleared when navigations are saved)."|t('tka-navigation'),
                 id: 'cacheDuration',
                 name: 'cacheDuration',
                 value: settings.cacheDuration,
+                type: 'number',
                 min: 0,
                 errors: settings.getErrors('cacheDuration'),
             }) }}
