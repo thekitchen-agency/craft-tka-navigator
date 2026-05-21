@@ -70,7 +70,7 @@ class TKANavigator extends Plugin
         Event::on(
             \craft\services\Elements::class,
             \craft\services\Elements::EVENT_REGISTER_ELEMENT_TYPES,
-            function (\craft\events\RegisterComponentTypesEvent $event) {
+            function(\craft\events\RegisterComponentTypesEvent $event) {
                 $event->types[] = Navigation::class;
             }
         );
@@ -79,7 +79,7 @@ class TKANavigator extends Plugin
         Event::on(
             \craft\web\UrlManager::class,
             \craft\web\UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function (\craft\events\RegisterUrlRulesEvent $event) {
+            function(\craft\events\RegisterUrlRulesEvent $event) {
                 $event->rules['tka-navigation'] = 'tka-navigation/navigation/index';
                 $event->rules['tka-navigation/new'] = 'tka-navigation/navigation/edit';
                 $event->rules['tka-navigation/edit/<elementId:\d+>'] = 'tka-navigation/navigation/edit';
@@ -90,7 +90,7 @@ class TKANavigator extends Plugin
         Event::on(
             \craft\web\twig\variables\CraftVariable::class,
             \craft\web\twig\variables\CraftVariable::EVENT_INIT,
-            function (Event $event) {
+            function(Event $event) {
                 /** @var \craft\web\twig\variables\CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('tkaNavigation', NavigationVariable::class);

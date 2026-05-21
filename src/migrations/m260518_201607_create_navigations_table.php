@@ -2,7 +2,6 @@
 
 namespace thekitchenagency\crafttkanavigation\migrations;
 
-use Craft;
 use craft\db\Migration;
 
 /**

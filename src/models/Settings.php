@@ -2,7 +2,6 @@
 
 namespace thekitchenagency\crafttkanavigation\models;
 
-use Craft;
 use craft\base\Model;
 
 /**
@@ -15,18 +14,19 @@ class Settings extends Model
     public bool $defaultExternalNewTab = false;
     public bool $enableCache = false;
     public int $cacheDuration = 3600;
+    public bool $useSlickLeanInterface = true;
 
     public function rules(): array
     {
         return [
             [['maxDepth', 'cacheDuration'], 'integer', 'min' => 0],
-            [['enableCssClasses', 'defaultExternalNewTab', 'enableCache'], 'boolean'],
+            [['enableCssClasses', 'defaultExternalNewTab', 'enableCache', 'useSlickLeanInterface'], 'boolean'],
             [['maxDepth'], 'default', 'value' => 0],
             [['enableCssClasses'], 'default', 'value' => true],
             [['defaultExternalNewTab'], 'default', 'value' => false],
             [['enableCache'], 'default', 'value' => false],
             [['cacheDuration'], 'default', 'value' => 3600],
+            [['useSlickLeanInterface'], 'default', 'value' => true],
         ];
     }
 }
-

@@ -28,6 +28,24 @@ composer require thekitchen-agency/craft-tka-navigation
 # tell Craft to install the plugin
 ./craft plugin/install tka-navigation
 ```
-# craft-tka-navigator
-# craft-tka-navigator
-# craft-tka-navigator
+## Features
+
+- **Dual Editor Interfaces**: Choose the workflow that fits your editors best:
+  - **Slick Lean Interface** (Default): A modern, ultra-compact inline visual tree editor. Manage labels, paths, classes, and new-tab targets directly inside the nodes without opening modals or sidebars.
+  - **Easy Interface**: A structured split-screen grid visual layout. Opens a premium sticky "Link Settings" sidebar inspector panel on the right for clean, focused node configuration.
+- **Bulk Import**:
+  - **Select Entries in Bulk**: Choose multiple entries from your catalog to instantly add them to the navigation structure as root-level links.
+  - **Paste Plain Text Links**: Paste lists of raw text links formatted as `Label | /path` to quickly populate your navigation layout.
+- **Nesting Restraints**: Set a maximum depth in the plugin settings to restrict editors from building menus that exceed your CSS design structure constraints.
+- **Custom CSS Classes**: Easily toggle optional custom CSS inputs per node inside the editor.
+- **Caching**: Performance-oriented database caching config with custom cache duration rules.
+
+## Configuration
+
+Navigate to **Settings -> Plugins -> tka navigation** to customize the plugin:
+- **Max Nesting Depth**: Set the maximum allowed depth (e.g. 1 for root only, 0 for unlimited).
+- **Enable Custom CSS Classes**: Toggle individual CSS fields per navigation node.
+- **Default External Links to New Tab**: Automatically check 'Open in New Tab' for newly added custom/external nodes.
+- **Use Slick Lean Editor Interface**: Toggle to switch between the inline editor and the sidebar inspector layouts.
+- **Performance & Caching**: Enable/disable cache and configure the custom TTL.
+

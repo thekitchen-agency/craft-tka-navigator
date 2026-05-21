@@ -63,6 +63,17 @@
                 errors: settings.getErrors('defaultExternalNewTab'),
             }) }}
         </div>
+
+        <div style="margin-top: 20px;">
+            {{ forms.lightswitchField({
+                label: "Use Slick Lean Editor Interface"|t('tka-navigation'),
+                instructions: "Enable the modern compact inline editing workspace. Disabling this switches back to the classic visual tree editor with the sidebar inspector panel."|t('tka-navigation'),
+                id: 'useSlickLeanInterface',
+                name: 'useSlickLeanInterface',
+                on: settings.useSlickLeanInterface,
+                errors: settings.getErrors('useSlickLeanInterface'),
+            }) }}
+        </div>
     </div>
 
     <!-- Section 2: Cache Settings -->

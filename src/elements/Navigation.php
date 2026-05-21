@@ -74,7 +74,7 @@ class Navigation extends Element
                 $depth = $this->_getNodesMaxDepth($this->nodes);
                 if ($depth > $settings->maxDepth) {
                     $this->addError($attribute, Craft::t('tka-navigation', 'The navigation hierarchy exceeds the maximum allowed nesting depth of {max}.', [
-                        'max' => $settings->maxDepth
+                        'max' => $settings->maxDepth,
                     ]));
                 }
             }

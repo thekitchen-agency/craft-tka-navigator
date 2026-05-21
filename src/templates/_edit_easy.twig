@@ -1,0 +1,1027 @@
+{% import '_includes/forms.twig' as forms %}
+<!-- Custom CSS Styling for Premium visual identity -->
+<style>
+    .tka-main-container {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 28px;
+        align-items: start;
+    }
+
+    .tka-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        padding: 28px;
+        transition: all 0.25s ease;
+    }
+
+    /* Beautiful responsive grid fields */
+    .tka-fields-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+        align-items: start;
+    }
+
+    .tka-fields-row .field {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .tka-fields-row .field .heading,
+    .tka-fields-row .field .input {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .tka-fields-row .field .heading label {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-block !important;
+        line-height: 1.2 !important;
+    }
+
+    .tka-tree-wrapper {
+        background: #f8fafc;
+        border: 1.5px dashed #cbd5e1;
+        border-radius: 12px;
+        min-height: 240px;
+        padding: 24px;
+        transition: all 0.25s ease;
+        position: relative;
+    }
+
+    .tka-tree-wrapper.drag-over-container {
+        border-color: #4f46e5;
+        background: #f0f4ff;
+    }
+
+    /* Tree lists and nesting layout */
+    .tka-tree-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .tka-tree-list .tka-tree-list {
+        padding-left: 36px;
+        margin-top: 10px;
+        position: relative;
+    }
+
+    /* Beautiful gradient line guides for visual depth */
+    .tka-tree-list .tka-tree-list::before {
+        content: '';
+        position: absolute;
+        left: 14px;
+        top: -10px;
+        bottom: 22px;
+        width: 2px;
+        background: linear-gradient(180deg, #cbd5e1 0%, rgba(203, 213, 225, 0.15) 100%);
+        border-radius: 1px;
+    }
+
+    .tka-tree-node {
+        position: relative;
+    }
+
+    /* Subtle child item connecting hooks */
+    .tka-tree-list .tka-tree-node::before {
+        content: '';
+        position: absolute;
+        left: -22px;
+        top: 24px;
+        width: 14px;
+        height: 2px;
+        background: #cbd5e1;
+    }
+
+    /* Stunning Premium Node Cards */
+    .tka-node-item {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 14px 20px;
+        display: grid;
+        grid-template-columns: auto auto 1fr auto;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+        position: relative;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+    }
+
+    .tka-node-item:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+        transform: translateY(-1px);
+    }
+
+    /* Drag Handles */
+    .tka-drag-handle {
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 18px;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .tka-drag-handle:hover {
+        background: #f1f5f9;
+        color: #334155;
+    }
+
+    .tka-node-item:active .tka-drag-handle {
+        cursor: grabbing;
+    }
+
+    /* Glowing accents on card edges matching the item categories */
+    .tka-node-item::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 12px;
+        bottom: 12px;
+        width: 4px;
+        border-radius: 0 4px 4px 0;
+        transition: all 0.2s ease;
+    }
+
+    .tka-node-item.type-entry::after { background: #6366f1; }
+    .tka-node-item.type-url::after { background: #10b981; }
+    .tka-node-item.type-anchor::after { background: #f59e0b; }
+    .tka-node-item.type-external::after { background: #0ea5e9; }
+
+    /* Highlight node active editing state */
+    .tka-node-item.is-editing {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12), 0 2px 4px rgba(0, 0, 0, 0.04);
+        background: #fafaff;
+    }
+
+    /* HTML5 Drag & Drop visual highlights - absolutely positioned to prevent layout shift */
+    .tka-node-item.drag-over-before::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #3b82f6;
+        border-radius: 2px;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+        z-index: 10;
+    }
+
+    .tka-node-item.drag-over-after::before {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #3b82f6;
+        border-radius: 2px;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+        z-index: 10;
+    }
+
+    .tka-node-item.drag-over-inside {
+        background: #eff6ff !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+        transform: scale(1.012);
+    }
+
+    .tka-tree-node.is-dragging {
+        opacity: 0.35;
+    }
+
+    /* Disable pointer-events on all sub-items during active drag to completely eliminate flickering */
+    .tka-tree-wrapper.is-dragging-active .tka-node-item * {
+        pointer-events: none !important;
+    }
+
+    /* Beautiful round icon frames for link categories */
+    .tka-icon-frame {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        transition: transform 0.2s ease;
+    }
+
+    .tka-node-item:hover .tka-icon-frame {
+        transform: scale(1.08);
+    }
+
+    .tka-icon-frame.type-entry { background: #eeeffe; color: #4f46e5; }
+    .tka-icon-frame.type-url { background: #e6fcf5; color: #0891b2; }
+    .tka-icon-frame.type-anchor { background: #fffbeb; color: #d97706; }
+    .tka-icon-frame.type-external { background: #f0f9ff; color: #0284c7; }
+
+    /* Floating animations for empty states */
+    @keyframes tka-float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Premium Right Inspector Card */
+    #node-editor-panel {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        background: #ffffff;
+        position: sticky;
+        top: 24px;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .tka-inspector-header {
+        font-size: 16px;
+        font-weight: 600;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 20px 0;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 16px;
+    }
+
+    /* Sleek node cards buttons & action buttons */
+    .tka-node-item .btn-edit-node {
+        background: #f1f5f9 !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        border-radius: 6px !important;
+        font-weight: 500 !important;
+        height: 26px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 12px !important;
+        transition: all 0.15s ease !important;
+    }
+
+    .tka-node-item .btn-edit-node:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+        border-color: #94a3b8 !important;
+    }
+
+    .tka-node-item .btn-add-child {
+        background: #f1f5f9 !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        transition: all 0.15s ease !important;
+    }
+
+    .tka-node-item .btn-add-child:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+        border-color: #94a3b8 !important;
+    }
+
+    .tka-node-item .btn-delete-node.delete {
+        background: #fef2f2 !important;
+        color: #ef4444 !important;
+        border: 1px solid #fee2e2 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        transition: all 0.15s ease !important;
+    }
+
+    .tka-node-item .btn-delete-node.delete:hover {
+        background: #fee2e2 !important;
+        color: #dc2626 !important;
+        border-color: #fca5a5 !important;
+    }
+
+    .tka-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+        height: 40px !important;
+        box-sizing: border-box !important;
+        font-weight: 500 !important;
+        transition: all 0.15s ease !important;
+        text-shadow: none !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    }
+</style>
+
+<form method="post" id="navigation-form" data-saveshortcut data-confirm-unload>
+    {{ csrfInput() }}
+    <input type="hidden" name="action" value="tka-navigation/navigation/save">
+    <input type="hidden" name="redirect" value="{{ 'tka-navigation'|hash }}">
+    <input type="hidden" name="elementId" value="{{ navigation.id }}">
+    <input type="hidden" name="siteId" value="{{ siteId }}">
+    <input type="hidden" name="nodes" id="nodes-json" value="{{ navigation.nodes ? navigation.nodes|json_encode : '[]' }}">
+
+    <div class="tka-main-container">
+        <!-- Left Side: Basic Fields & Tree Builder -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div class="tka-card">
+                <!-- Basic details block -->
+                <div class="tka-fields-row">
+                    {{ forms.textField({
+                        label: 'Title'|t,
+                        id: 'title',
+                        name: 'title',
+                        value: navigation.title,
+                        placeholder: 'Main Navigation'|t('tka-navigation'),
+                        required: true,
+                        autofocus: true
+                    }) }}
+
+                    {{ forms.textField({
+                        label: 'Handle'|t,
+                        id: 'handle',
+                        name: 'handle',
+                        value: navigation.handle,
+                        placeholder: 'mainNavigation'|t('tka-navigation'),
+                        required: true
+                    }) }}
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;">
+
+                <!-- Structure Builder Header -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                    <h3 style="margin: 0; font-size: 15px; font-weight: 600; color: #0f172a;">{{ "Navigation Structure"|t('tka-navigation') }}</h3>
+                    <button type="button" class="btn submit add icon" id="add-root-btn" style="border-radius: 8px;">{{ "Add Link"|t('tka-navigation') }}</button>
+                </div>
+
+                <!-- Beautiful Tree Container -->
+                <div id="tree-container" class="tka-tree-wrapper">
+                    <!-- Dynamic node elements nested recursively will render here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Node Details Inspector Panel -->
+        <div class="tka-card" id="node-editor-panel" style="display: none;">
+            <h3 class="tka-inspector-header">
+                <span>⚙️</span> {{ "Link Settings"|t('tka-navigation') }}
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 18px;">
+                <!-- Link Type -->
+                <div>
+                    <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Link Type"|t('tka-navigation') }}</label>
+                    <select id="node-type" class="select" style="width: 100%; border-radius: 6px;">
+                        <option value="entry">{{ "Craft Entry"|t('tka-navigation') }}</option>
+                        <option value="url">{{ "Custom URL"|t('tka-navigation') }}</option>
+                        <option value="anchor">{{ "Anchor inside Page"|t('tka-navigation') }}</option>
+                        <option value="external">{{ "External URL"|t('tka-navigation') }}</option>
+                    </select>
+                </div>
+
+                <!-- Entry Selection -->
+                <div id="field-entry-wrapper">
+                    <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Select Entry"|t('tka-navigation') }}</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" class="btn" id="select-entry-btn" style="border-radius: 6px;">{{ "Select Entry"|t('tka-navigation') }}</button>
+                        <span id="selected-entry-display" style="font-size: 12px; color: #64748b; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px;">{{ "No entry selected"|t('tka-navigation') }}</span>
+                        <button type="button" class="btn small delete hidden" id="clear-entry-btn" style="border-radius: 6px;">×</button>
+                    </div>
+                </div>
+
+                <!-- URL / Custom URL Input -->
+                <div id="field-url-wrapper">
+                    <label class="label" id="url-label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "URL"|t('tka-navigation') }}</label>
+                    <input type="text" id="node-url" class="text" style="width: 100%; border-radius: 6px;" placeholder="/about-us or https://...">
+                </div>
+
+                <!-- Anchor Input -->
+                <div id="field-anchor-wrapper">
+                    <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Anchor"|t('tka-navigation') }}</label>
+                    <input type="text" id="node-anchor" class="text" style="width: 100%; border-radius: 6px;" placeholder="#contact-form">
+                </div>
+
+                <!-- Custom Label -->
+                <div>
+                    <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Custom Label"|t('tka-navigation') }}</label>
+                    <input type="text" id="node-label" class="text" style="width: 100%; border-radius: 6px;" placeholder="{{ 'Leave blank to use Entry Title'|t('tka-navigation') }}">
+                </div>
+
+                <!-- CSS Class -->
+                {% if settings.enableCssClasses %}
+                <div>
+                    <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Custom CSS Class"|t('tka-navigation') }}</label>
+                    <input type="text" id="node-css-class" class="text" style="width: 100%; border-radius: 6px;" placeholder="e.g. nav-highlight">
+                </div>
+                {% endif %}
+
+                <!-- Target / Open in New Tab -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid #f1f5f9;">
+                    <span style="font-weight: 500; font-size: 13px; color: #475569;">{{ "Open in New Tab"|t('tka-navigation') }}</span>
+                    <div class="lightswitch" id="node-new-tab-switch" role="checkbox" aria-checked="false" tabindex="0">
+                        <div class="lightswitch-container">
+                            <div class="handle"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                    <button type="button" class="btn submit primary" id="save-node-btn" style="flex: 1; border-radius: 6px;">{{ "Apply Changes"|t('tka-navigation') }}</button>
+                    <button type="button" class="btn" id="cancel-node-btn" style="border-radius: 6px;">{{ "Close"|t }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="buttons" style="margin-top: 36px; display: flex; gap: 12px; align-items: center;">
+        <button type="submit" class="btn submit primary large tka-btn" style="border-radius: 8px; padding: 0 24px;">{{ 'Save'|t }}</button>
+        <a href="{{ url('tka-navigation') }}" class="btn large tka-btn" style="border-radius: 8px; padding: 0 24px;">{{ 'Cancel'|t }}</a>
+    </div>
+</form>
+
+{% js %}
+$(function() {
+    // 1. Initial State from JSON input
+    let nodes = JSON.parse($('#nodes-json').val() || '[]');
+    let currentEditingNodeId = null;
+
+    // Database of preloaded entry titles from PHP to prevent displaying empty IDs
+    const preloadedEntryNames = {{ entryNames|json_encode|raw }};
+
+    // Auto-generate Handle from Title if new navigation
+    {% if not navigation.id %}
+    var $titleInput = $('#title');
+    var $handleInput = $('#handle');
+    $titleInput.on('input', function() {
+        var slug = Craft.slugify($titleInput.val());
+        // camelCase conversion
+        var camelCase = slug.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+        $handleInput.val(camelCase);
+    });
+    {% endif %}
+
+    // Helper to generate a unique ID
+    function generateId() {
+        return 'node_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    }
+
+    // Toggle logic for the Open in New Tab Switch
+    const $switch = $('#node-new-tab-switch');
+    $switch.on('click', function() {
+        const isChecked = $switch.attr('aria-checked') === 'true';
+        $switch.attr('aria-checked', (!isChecked).toString());
+        $switch.toggleClass('on', !isChecked);
+    });
+    function setSwitchState(state) {
+        $switch.attr('aria-checked', state.toString());
+        $switch.toggleClass('on', state);
+    }
+
+    // 2. Render Node helper (Recursive to output structured nested HTML tree)
+    function renderNode(node, level = 0) {
+        const typeIcons = {
+            entry: '📄',
+            url: '🔗',
+            anchor: '⚓',
+            external: '🌐'
+        };
+
+        const typeLabels = {
+            entry: 'Entry',
+            url: 'Custom URL',
+            anchor: 'Anchor',
+            external: 'External URL'
+        };
+
+        let displayName = node.customLabel || '';
+        if (!displayName && node.type === 'entry' && node.entryId) {
+            displayName = preloadedEntryNames[node.entryId] || node.entryTitle || 'Entry ID: ' + node.entryId;
+        } else if (!displayName) {
+            displayName = node.url || node.anchor || 'Untitled Link';
+        }
+
+        let targetInfo = '';
+        if (node.type === 'entry' && node.entryId) {
+            targetInfo = preloadedEntryNames[node.entryId] || node.entryTitle || 'Entry #' + node.entryId;
+        } else if (node.type === 'url' || node.type === 'external') {
+            targetInfo = node.url || '';
+        } else if (node.type === 'anchor') {
+            let entryName = node.entryId ? (preloadedEntryNames[node.entryId] || node.entryTitle || 'Entry #' + node.entryId) : '';
+            targetInfo = (entryName ? entryName + ' ' : '') + (node.anchor || '');
+        }
+
+        const isEditing = currentEditingNodeId === node.id;
+
+        // Render children if any recursively
+        let childHtml = '';
+        if (node.children && node.children.length > 0) {
+            childHtml = `
+                <ul class="tka-tree-list">
+                    ${node.children.map(child => renderNode(child, level + 1)).join('')}
+                </ul>
+            `;
+        }
+
+        // Return nested item structure
+        return `
+            <li class="tka-tree-node" data-id="${node.id}">
+                <div class="tka-node-item type-${node.type} ${isEditing ? 'is-editing' : ''}" data-id="${node.id}" draggable="true">
+                    <!-- Drag handle -->
+                    <div class="tka-drag-handle" title="${Craft.t('tka-navigation', 'Drag to reorder/nest')}">⋮⋮</div>
+                    
+                    <!-- Icon -->
+                    <div class="tka-icon-frame type-${node.type}">${typeIcons[node.type] || '🔗'}</div>
+                    
+                    <!-- Content Details -->
+                    <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-weight: 600; color: #0f172a; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px;">${escapeHtml(displayName)}</span>
+                            <span style="font-size: 10px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500;">
+                                ${typeLabels[node.type]}
+                            </span>
+                            ${node.newTab ? `<span style="font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 500;">New Tab</span>` : ''}
+                        </div>
+                        <div style="font-size: 11px; color: #64748b; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">${escapeHtml(targetInfo)}</div>
+                    </div>
+                    
+                    <!-- Control buttons -->
+                    <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+                        <button type="button" class="btn btn-edit-node small">Edit</button>
+                        <button type="button" class="btn btn-add-child small" title="${Craft.t('tka-navigation', 'Add Sublink')}" style="border-radius: 6px; font-weight: bold; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0;">+</button>
+                        <button type="button" class="btn btn-delete-node small delete" style="border-radius: 6px; font-weight: bold; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0;">×</button>
+                    </div>
+                </div>
+                ${childHtml}
+            </li>
+        `;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // 3. Render Tree Main Trigger
+    function renderTree() {
+        const container = $('#tree-container');
+        if (nodes.length === 0) {
+            container.html(`
+                <div style="text-align: center; padding: 48px 24px; color: #64748b; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                    <div style="font-size: 40px; margin-bottom: 8px; animation: tka-float 3s ease-in-out infinite;">🗺️</div>
+                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #0f172a;">${Craft.t('tka-navigation', 'No links built yet')}</h4>
+                    <p style="margin: 0; max-width: 280px; font-size: 13px; color: #64748b; line-height: 1.5;">
+                        ${Craft.t('tka-navigation', 'Click "Add Link" to start creating your beautiful structured menu.')}
+                    </p>
+                </div>
+            `);
+            $('#nodes-json').val('[]');
+            return;
+        }
+
+        let treeHtml = '<ul class="tka-tree-list">';
+        nodes.forEach(node => {
+            treeHtml += renderNode(node, 0);
+        });
+        treeHtml += '</ul>';
+        container.html(treeHtml);
+
+        // Serialize state to hidden field
+        $('#nodes-json').val(JSON.stringify(nodes));
+
+        // Proactively set up native HTML5 Drag and Drop events
+        setupDragAndDrop();
+    }
+
+    // 4. Tree Manipulation Operations
+    // Find node and its parent, index
+    function findNodeAndParent(list, nodeId, parent = null) {
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].id === nodeId) {
+                return { node: list[i], parent: parent, index: i, siblings: list };
+            }
+            if (list[i].children && list[i].children.length > 0) {
+                const found = findNodeAndParent(list[i].children, nodeId, list[i]);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
+    // Protection to block circular nesting (cannot drag a parent node into its own descendant)
+    function isDescendant(parentNode, targetId) {
+        if (!parentNode.children) return false;
+        for (let child of parentNode.children) {
+            if (child.id === targetId) return true;
+            if (isDescendant(child, targetId)) return true;
+        }
+        return false;
+    }
+
+    // Calculate the current depth of a node in the tree (1-indexed, root nodes are depth 1)
+    function getNodeDepth(list, nodeId, currentDepth = 1) {
+        for (let node of list) {
+            if (node.id === nodeId) {
+                return currentDepth;
+            }
+            if (node.children && node.children.length > 0) {
+                const depth = getNodeDepth(node.children, nodeId, currentDepth + 1);
+                if (depth !== null) return depth;
+            }
+        }
+        return null;
+    }
+
+    // Calculate the height of a sub-tree (root only is height 1, root + child is height 2, etc.)
+    function getNodeHeight(node) {
+        if (!node.children || node.children.length === 0) {
+            return 1;
+        }
+        let maxChildHeight = 0;
+        for (let i = 0; i < node.children.length; i++) {
+            const h = getNodeHeight(node.children[i]);
+            if (h > maxChildHeight) {
+                maxChildHeight = h;
+            }
+        }
+        return 1 + maxChildHeight;
+    }
+
+    // 5. Native HTML5 Drag and Drop Engine
+    let draggedNodeId = null;
+
+    function setupDragAndDrop() {
+        const items = document.querySelectorAll('.tka-node-item');
+        const container = document.querySelector('#tree-container');
+
+        items.forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                draggedNodeId = this.dataset.id;
+                this.closest('.tka-tree-node').classList.add('is-dragging');
+                if (container) {
+                    container.classList.add('is-dragging-active');
+                }
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', draggedNodeId);
+            });
+
+            item.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                const targetId = this.dataset.id;
+
+                // Stop if dragging over yourself
+                if (targetId === draggedNodeId) return;
+
+                // Stop if dragging a parent into one of its children
+                const dragged = findNodeAndParent(nodes, draggedNodeId);
+                if (dragged && isDescendant(dragged.node, targetId)) {
+                    e.dataTransfer.dropEffect = 'none';
+                    return;
+                }
+
+                e.dataTransfer.dropEffect = 'move';
+
+                const rect = this.getBoundingClientRect();
+                const relativeY = e.clientY - rect.top;
+                const pctY = relativeY / rect.height;
+
+                let position = 'inside';
+                if (pctY < 0.33) {
+                    position = 'before';
+                } else if (pctY > 0.66) {
+                    position = 'after';
+                }
+
+                // Check depth limit
+                const maxDepth = {{ settings.maxDepth|json_encode }};
+                if (maxDepth > 0 && dragged) {
+                    const targetDepth = getNodeDepth(nodes, targetId);
+                    const draggedHeight = getNodeHeight(dragged.node);
+                    const projectedDepth = (position === 'inside') ? (targetDepth + draggedHeight) : (targetDepth - 1 + draggedHeight);
+
+                    if (projectedDepth > maxDepth) {
+                        e.dataTransfer.dropEffect = 'none';
+                        this.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-inside');
+                        return;
+                    }
+                }
+
+                this.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-inside');
+
+                if (position === 'before') {
+                    this.classList.add('drag-over-before');
+                } else if (position === 'after') {
+                    this.classList.add('drag-over-after');
+                } else {
+                    this.classList.add('drag-over-inside');
+                }
+            });
+
+            item.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-inside');
+            });
+
+            item.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const targetId = this.dataset.id;
+
+                if (targetId === draggedNodeId) return;
+
+                const dragged = findNodeAndParent(nodes, draggedNodeId);
+                if (!dragged) return;
+
+                if (isDescendant(dragged.node, targetId)) return;
+
+                // Determine position based on hover classes
+                let position = 'inside';
+                if (this.classList.contains('drag-over-before')) {
+                    position = 'before';
+                } else if (this.classList.contains('drag-over-after')) {
+                    position = 'after';
+                }
+
+                // Check depth limit
+                const maxDepth = {{ settings.maxDepth|json_encode }};
+                if (maxDepth > 0) {
+                    const targetDepth = getNodeDepth(nodes, targetId);
+                    const draggedHeight = getNodeHeight(dragged.node);
+                    const projectedDepth = (position === 'inside') ? (targetDepth + draggedHeight) : (targetDepth - 1 + draggedHeight);
+
+                    if (projectedDepth > maxDepth) {
+                        this.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-inside');
+                        Craft.cp.displayError(Craft.t('tka-navigation', 'Cannot move link here. Maximum nesting depth limit of {max} reached.', {
+                            max: maxDepth
+                        }));
+                        return;
+                    }
+                }
+
+                this.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-inside');
+
+                // Perform list mutation
+                // 1. Splice item out from original parent list
+                dragged.siblings.splice(dragged.index, 1);
+
+                // 2. Find target in updated tree & insert
+                const target = findNodeAndParent(nodes, targetId);
+                if (target) {
+                    if (position === 'inside') {
+                        if (!target.node.children) {
+                            target.node.children = [];
+                        }
+                        target.node.children.push(dragged.node);
+                    } else if (position === 'before') {
+                        target.siblings.splice(target.index, 0, dragged.node);
+                    } else if (position === 'after') {
+                        target.siblings.splice(target.index + 1, 0, dragged.node);
+                    }
+                }
+
+                renderTree();
+            });
+
+            item.addEventListener('dragend', function() {
+                const parentNodeNode = this.closest('.tka-tree-node');
+                if (parentNodeNode) {
+                    parentNodeNode.classList.remove('is-dragging');
+                }
+                if (container) {
+                    container.classList.remove('is-dragging-active');
+                }
+                document.querySelectorAll('.tka-node-item').forEach(el => {
+                    el.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-inside');
+                });
+            });
+        });
+    }
+
+    // Add Root Link
+    $('#add-root-btn').on('click', function() {
+        const newNode = {
+            id: generateId(),
+            type: 'entry',
+            entryId: null,
+            entryTitle: '',
+            customLabel: '',
+            url: '',
+            anchor: '',
+            newTab: {{ settings.defaultExternalNewTab ? 'true' : 'false' }},
+            cssClass: '',
+            children: []
+        };
+        nodes.push(newNode);
+        renderTree();
+        openEditor(newNode.id);
+    });
+
+    // Add Child Link
+    $(document).on('click', '.btn-add-child', function() {
+        const parentId = $(this).closest('.tka-node-item').data('id');
+        const found = findNodeAndParent(nodes, parentId);
+        if (found) {
+            const maxDepth = {{ settings.maxDepth|json_encode }};
+            if (maxDepth > 0) {
+                const parentDepth = getNodeDepth(nodes, parentId);
+                if (parentDepth + 1 > maxDepth) {
+                    Craft.cp.displayError(Craft.t('tka-navigation', 'Cannot add sublink. Maximum nesting depth limit of {max} reached.', {
+                        max: maxDepth
+                    }));
+                    return;
+                }
+            }
+
+            const newNode = {
+                id: generateId(),
+                type: 'entry',
+                entryId: null,
+                entryTitle: '',
+                customLabel: '',
+                url: '',
+                anchor: '',
+                newTab: {{ settings.defaultExternalNewTab ? 'true' : 'false' }},
+                cssClass: '',
+                children: []
+            };
+            if (!found.node.children) found.node.children = [];
+            found.node.children.push(newNode);
+            renderTree();
+            openEditor(newNode.id);
+        }
+    });
+
+    // Delete Link
+    $(document).on('click', '.btn-delete-node', function() {
+        const id = $(this).closest('.tka-node-item').data('id');
+        const found = findNodeAndParent(nodes, id);
+        if (found) {
+            if (confirm(Craft.t('tka-navigation', 'Are you sure you want to delete this link and all its children?'))) {
+                found.siblings.splice(found.index, 1);
+                if (currentEditingNodeId === id) {
+                    closeEditor();
+                }
+                renderTree();
+            }
+        }
+    });
+
+    // 6. Link Settings Form Editor Panel Control
+    const $panel = $('#node-editor-panel');
+    const $typeSelect = $('#node-type');
+    const $entryWrapper = $('#field-entry-wrapper');
+    const $urlWrapper = $('#field-url-wrapper');
+    const $anchorWrapper = $('#field-anchor-wrapper');
+    const $urlLabel = $('#url-label');
+
+    let selectedEntryId = null;
+    let selectedEntryTitle = null;
+
+    function openEditor(nodeId) {
+        currentEditingNodeId = nodeId;
+        const found = findNodeAndParent(nodes, nodeId);
+        if (!found) return;
+
+        const node = found.node;
+
+        // Reset display fields
+        $typeSelect.val(node.type);
+        $('#node-label').val(node.customLabel || '');
+        $('#node-url').val(node.url || '');
+        $('#node-anchor').val(node.anchor || '');
+        $('#node-css-class').val(node.cssClass || '');
+        setSwitchState(node.newTab || false);
+
+        selectedEntryId = node.entryId;
+        selectedEntryTitle = preloadedEntryNames[node.entryId] || node.entryTitle || '';
+
+        updateFormFieldsVisibility();
+        renderTree(); // Highlight active node
+        $panel.fadeIn(150);
+    }
+
+    function closeEditor() {
+        currentEditingNodeId = null;
+        $panel.fadeOut(150);
+        renderTree();
+    }
+
+    function updateFormFieldsVisibility() {
+        const type = $typeSelect.val();
+        $entryWrapper.addClass('hidden').hide();
+        $urlWrapper.addClass('hidden').hide();
+        $anchorWrapper.addClass('hidden').hide();
+
+        if (type === 'entry') {
+            $entryWrapper.removeClass('hidden').show();
+            updateEntryDisplay();
+        } else if (type === 'url') {
+            $urlWrapper.removeClass('hidden').show();
+            $urlLabel.text(Craft.t('tka-navigation', 'Custom Path / URL'));
+        } else if (type === 'anchor') {
+            $entryWrapper.removeClass('hidden').show();
+            $anchorWrapper.removeClass('hidden').show();
+            updateEntryDisplay();
+        } else if (type === 'external') {
+            $urlWrapper.removeClass('hidden').show();
+            $urlLabel.text(Craft.t('tka-navigation', 'External URL'));
+        }
+    }
+
+    function updateEntryDisplay() {
+        if (selectedEntryId) {
+            $('#selected-entry-display').text(selectedEntryTitle || 'Entry ID: ' + selectedEntryId).css('color', '#0f172a');
+            $('#clear-entry-btn').removeClass('hidden').show();
+        } else {
+            $('#selected-entry-display').text(Craft.t('tka-navigation', 'No entry selected')).css('color', '#94a3b8');
+            $('#clear-entry-btn').addClass('hidden').hide();
+        }
+    }
+
+    $typeSelect.on('change', function() {
+        updateFormFieldsVisibility();
+        {% if settings.defaultExternalNewTab %}
+        if ($typeSelect.val() === 'external') {
+            setSwitchState(true);
+        }
+        {% endif %}
+    });
+
+    // Click trigger for Select Entry
+    $('#select-entry-btn').on('click', function() {
+        Craft.createElementSelectorModal('craft\\elements\\Entry', {
+            multiSelect: false,
+            onSelect: function(entries) {
+                if (entries.length > 0) {
+                    const entry = entries[0];
+                    selectedEntryId = entry.id;
+                    selectedEntryTitle = entry.label;
+                    preloadedEntryNames[entry.id] = entry.label; // Preload it
+                    updateEntryDisplay();
+                }
+            }
+        });
+    });
+
+    // Clear Entry selection
+    $('#clear-entry-btn').on('click', function() {
+        selectedEntryId = null;
+        selectedEntryTitle = null;
+        updateEntryDisplay();
+    });
+
+    // Save Node Details Panel changes
+    $('#save-node-btn').on('click', function() {
+        if (!currentEditingNodeId) return;
+
+        const found = findNodeAndParent(nodes, currentEditingNodeId);
+        if (found) {
+            const node = found.node;
+            node.type = $typeSelect.val();
+            node.customLabel = $('#node-label').val();
+            node.url = $('#node-url').val();
+            node.anchor = $('#node-anchor').val();
+            node.cssClass = $('#node-css-class').val() || '';
+            node.newTab = $switch.attr('aria-checked') === 'true';
+            node.entryId = selectedEntryId;
+            node.entryTitle = selectedEntryTitle;
+
+            closeEditor();
+        }
+    });
+
+    // Cancel / Close settings panel
+    $('#cancel-node-btn').on('click', closeEditor);
+
+    // Edit link click in list
+    $(document).on('click', '.btn-edit-node', function() {
+        const id = $(this).closest('.tka-node-item').data('id');
+        openEditor(id);
+    });
+
+    // Initial render call
+    renderTree();
+});
+{% endjs %}
