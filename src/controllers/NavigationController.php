@@ -41,7 +41,17 @@ class NavigationController extends Controller
             $navigation->siteId = $siteId;
         }
 
-        // Extract entry names for the frontend editor
+        $entryNames = $this->getEntryNames($navigation, $siteId);
+
+        return $this->renderTemplate('tka-navigation/edit', [
+            'navigation' => $navigation,
+            'siteId' => $siteId,
+            'entryNames' => $entryNames,
+        ]);
+    }
+
+    private function getEntryNames(Navigation $navigation, int $siteId): array
+    {
         $entryNames = [];
         if ($navigation->nodes) {
             $entryIds = self::extractEntryIds($navigation->nodes);
@@ -52,12 +62,7 @@ class NavigationController extends Controller
                 }
             }
         }
-
-        return $this->renderTemplate('tka-navigation/edit', [
-            'navigation' => $navigation,
-            'siteId' => $siteId,
-            'entryNames' => $entryNames,
-        ]);
+        return $entryNames;
     }
 
     private static function extractEntryIds(array $nodes): array
@@ -107,6 +112,7 @@ class NavigationController extends Controller
             return $this->renderTemplate('tka-navigation/edit', [
                 'navigation' => $navigation,
                 'siteId' => $siteId,
+                'entryNames' => $this->getEntryNames($navigation, $siteId),
             ]);
         }
 
