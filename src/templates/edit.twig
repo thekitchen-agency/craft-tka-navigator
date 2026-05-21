@@ -619,33 +619,65 @@ $(function() {
             `;
         }
 
-        // Return nested item structure
+        const isChecked = node.newTab ? 'checked' : '';
+        const checkClass = node.newTab ? 'is-checked' : '';
+
+        // Pull dynamic CSS setting from model bounds
+        const enableCss = {{ settings.enableCssClasses ? 'true' : 'false' }};
+
         return `
             <li class="tka-tree-node" data-id="${node.id}">
-                <div class="tka-node-item type-${node.type} ${isEditing ? 'is-editing' : ''}" data-id="${node.id}" draggable="true">
+                <div class="tka-node-row tka-row-depth-${level} type-${node.type}" data-id="${node.id}" draggable="true">
                     <!-- Drag handle -->
-                    <div class="tka-drag-handle" title="${Craft.t('tka-navigation', 'Drag to reorder/nest')}">⋮⋮</div>
+                    <div class="tka-row-drag-handle" title="${Craft.t('tka-navigation', 'Drag to reorder/nest')}">⋮⋮</div>
                     
-                    <!-- Icon -->
-                    <div class="tka-icon-frame type-${node.type}">${typeIcons[node.type] || '🔗'}</div>
-                    
-                    <!-- Content Details -->
-                    <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
-                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                            <span style="font-weight: 600; color: #0f172a; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px;">${escapeHtml(displayName)}</span>
-                            <span style="font-size: 10px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 500;">
-                                ${typeLabels[node.type]}
-                            </span>
-                            ${node.newTab ? `<span style="font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 500;">New Tab</span>` : ''}
-                        </div>
-                        <div style="font-size: 11px; color: #64748b; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">${escapeHtml(targetInfo)}</div>
+                    <!-- Content Fields Row -->
+                    <div class="tka-row-fields">
+                        <!-- Low-profile Type Selector -->
+                        <select class="tka-row-type-select" data-id="${node.id}">
+                            <option value="entry" ${isEntry ? 'selected' : ''}>📄 Entry</option>
+                            <option value="url" ${isUrl ? 'selected' : ''}>🔗 Custom</option>
+                            <option value="anchor" ${isAnchor ? 'selected' : ''}>⚓ Anchor</option>
+                            <option value="external" ${isExternal ? 'selected' : ''}>🌐 External</option>
+                        </select>
+                        
+                        <!-- Entry Selector Pill (Only visible for entries or page anchors) -->
+                        ${(isEntry || isAnchor) ? `
+                            <div class="tka-row-entry-pill ${!node.entryId ? 'is-empty' : ''}" data-id="${node.id}">
+                                <span>${entryText || Craft.t('tka-navigation', 'Choose Entry...')}</span>
+                                ${node.entryId ? `<span class="tka-row-entry-pill-clear">&times;</span>` : ''}
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Inline Title Label Input -->
+                        <input type="text" class="tka-row-input tka-row-label" data-id="${node.id}" value="${escapeHtml(node.customLabel || '')}" placeholder="${isEntry ? Craft.t('tka-navigation', 'Use entry title') : Craft.t('tka-navigation', 'Link Label')}" />
+                        
+                        <!-- Custom URL / Path input -->
+                        ${(isUrl || isExternal) ? `
+                            <input type="text" class="tka-row-input tka-row-url" data-id="${node.id}" value="${escapeHtml(node.url || '')}" placeholder="${isExternal ? 'https://...' : '/path'}" />
+                        ` : ''}
+                        
+                        <!-- Sibling Anchor target input -->
+                        ${isAnchor ? `
+                            <input type="text" class="tka-row-input tka-row-anchor" data-id="${node.id}" value="${escapeHtml(node.anchor || '')}" placeholder="#anchor" />
+                        ` : ''}
+                        
+                        <!-- Custom Css class input -->
+                        ${enableCss ? `
+                            <input type="text" class="tka-row-input tka-row-css" data-id="${node.id}" value="${escapeHtml(node.cssClass || '')}" placeholder="CSS Class" />
+                        ` : ''}
+                        
+                        <!-- New Tab target checkbox toggle -->
+                        <label class="tka-row-toggle ${checkClass}" title="${Craft.t('tka-navigation', 'Open in new tab')}">
+                            <input type="checkbox" class="tka-row-checkbox" data-id="${node.id}" ${isChecked} />
+                            <span class="tka-row-toggle-icon">↗</span>
+                        </label>
                     </div>
                     
-                    <!-- Control buttons -->
-                    <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
-                        <button type="button" class="btn btn-edit-node small">Edit</button>
-                        <button type="button" class="btn btn-add-child small" title="${Craft.t('tka-navigation', 'Add Sublink')}" style="border-radius: 6px; font-weight: bold; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0;">+</button>
-                        <button type="button" class="btn btn-delete-node small delete" style="border-radius: 6px; font-weight: bold; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0;">×</button>
+                    <!-- Action tools revealed on row hover -->
+                    <div class="tka-row-actions">
+                        <button type="button" class="tka-action-btn btn-add-child" title="${Craft.t('tka-navigation', 'Add Sublink')}">+</button>
+                        <button type="button" class="tka-action-btn btn-delete-node" title="${Craft.t('tka-navigation', 'Delete')}">🗑️</button>
                     </div>
                 </div>
                 ${childHtml}
