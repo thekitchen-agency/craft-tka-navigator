@@ -1,0 +1,95 @@
+{# @var plugin \thekitchenagency\crafttkanavigation\TKANavigator #}
+{# @var settings \thekitchenagency\crafttkanavigation\models\Settings #}
+
+{% import '_includes/forms.twig' as forms %}
+
+<div class="tka-settings-container" style="max-width: 800px; margin: 0 auto; padding: 12px 0;">
+    <!-- Brand Banner -->
+    <div style="background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); padding: 32px; border-radius: 12px; color: #ffffff; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(79, 70, 229, 0.15); display: flex; align-items: center; gap: 24px;">
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); flex-shrink: 0;">
+            <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M24 6V14" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 22H36" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 22V30C12 32.2091 13.7909 34 16 34H32C34.2091 34 36 32.2091 36 30V22" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="24" cy="6" r="2" fill="#ffffff"/>
+                <circle cx="12" cy="22" r="2" fill="#ffffff"/>
+                <circle cx="36" cy="22" r="2" fill="#ffffff"/>
+                <path d="M24 34V42" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="24" cy="42" r="2" fill="#ffffff"/>
+            </svg>
+        </div>
+        <div>
+            <h2 style="margin: 0 0 6px 0; font-size: 20px; font-weight: 600; color: #ffffff; font-family: system-ui, -apple-system, sans-serif;">tka navigation</h2>
+            <p style="margin: 0; font-size: 13px; color: rgba(255, 255, 255, 0.85); line-height: 1.5;">Customize editor behaviors, nesting depth restrictions, and toggle output query performance cache configurations.</p>
+        </div>
+    </div>
+
+    <!-- Section 1: Editor Settings -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+        <h3 style="margin-top: 0; margin-bottom: 18px; font-size: 15px; font-weight: 600; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🛠️</span> Editor Configurations
+        </h3>
+
+        {{ forms.numberField({
+            label: "Max Nesting Depth"|t('tka-navigation'),
+            instructions: "The maximum depth navigation links can be nested. Set to 0 or leave empty for unlimited nesting depth (e.g. 1 allows only root nodes)."|t('tka-navigation'),
+            id: 'maxDepth',
+            name: 'maxDepth',
+            value: settings.maxDepth,
+            min: 0,
+            warning: (settings.maxDepth == 1) ? "Nesting is completely disabled."|t('tka-navigation') : null,
+            errors: settings.getErrors('maxDepth'),
+        }) }}
+
+        <div style="margin-top: 20px;">
+            {{ forms.lightswitchField({
+                label: "Enable Custom CSS Classes"|t('tka-navigation'),
+                instructions: "Allow content editors to assign custom CSS classes to individual navigation nodes for unique page layout styling."|t('tka-navigation'),
+                id: 'enableCssClasses',
+                name: 'enableCssClasses',
+                on: settings.enableCssClasses,
+                errors: settings.getErrors('enableCssClasses'),
+            }) }}
+        </div>
+
+        <div style="margin-top: 20px;">
+            {{ forms.lightswitchField({
+                label: "Default External Links to New Tab"|t('tka-navigation'),
+                instructions: "Automatically toggle 'Open in New Tab' to active by default when creating new Custom/External URL nodes."|t('tka-navigation'),
+                id: 'defaultExternalNewTab',
+                name: 'defaultExternalNewTab',
+                on: settings.defaultExternalNewTab,
+                errors: settings.getErrors('defaultExternalNewTab'),
+            }) }}
+        </div>
+    </div>
+
+    <!-- Section 2: Cache Settings -->
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+        <h3 style="margin-top: 0; margin-bottom: 18px; font-size: 15px; font-weight: 600; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">⚡</span> Performance & Caching
+        </h3>
+
+        {{ forms.lightswitchField({
+            label: "Enable Output Caching"|t('tka-navigation'),
+            instructions: "Store the resolved navigation nodes in Craft's cache engine to avoid duplicate database operations on the front-end."|t('tka-navigation'),
+            id: 'enableCache',
+            name: 'enableCache',
+            on: settings.enableCache,
+            toggle: 'cacheDuration-wrapper',
+            errors: settings.getErrors('enableCache'),
+        }) }}
+
+        <div id="cacheDuration-wrapper" style="margin-top: 20px; {% if not settings.enableCache %}display: none;{% endif %}">
+            {{ forms.numberField({
+                label: "Cache Duration (seconds)"|t('tka-navigation'),
+                instructions: "Specify the TTL in seconds. Enter 0 or leave empty to cache permanently (automatically cleared when navigations are saved)."|t('tka-navigation'),
+                id: 'cacheDuration',
+                name: 'cacheDuration',
+                value: settings.cacheDuration,
+                min: 0,
+                errors: settings.getErrors('cacheDuration'),
+            }) }}
+        </div>
+    </div>
+</div>
