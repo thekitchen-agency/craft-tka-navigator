@@ -49,3 +49,41 @@ Navigate to **Settings -> Plugins -> tka navigation** to customize the plugin:
 - **Use Slick Lean Editor Interface**: Toggle to switch between the inline editor and the sidebar inspector layouts.
 - **Performance & Caching**: Enable/disable cache and configure the custom TTL.
 
+## Template Usage
+
+To render a navigation in your Twig templates, retrieve it using the `craft.tkaNavigation.get` variable helper by passing its handle, and loop through its resolved nodes:
+
+```twig
+{# 1. Retrieve the navigation by its handle #}
+{% set navigation = craft.tkaNavigation.get('mainNavigation') %}
+
+{# 2. Render the resolved navigation structure #}
+{% if navigation %}
+    <nav class="navigation">
+        <ul>
+            {% for node in navigation.getResolvedNodes() %}
+                <li class="{{ node.cssClass }}">
+                    <a href="{{ node.url }}" {% if node.newTab %}target="_blank" rel="noopener"{% endif %}>
+                        {{ node.label }}
+                    </a>
+
+                    {# Render children recursively (supports unlimited nesting levels) #}
+                    {% if node.children|length %}
+                        <ul class="dropdown">
+                            {% for child in node.children %}
+                                <li class="{{ child.cssClass }}">
+                                    <a href="{{ child.url }}" {% if child.newTab %}target="_blank" rel="noopener"{% endif %}>
+                                        {{ child.label }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endif %}
+```
+
+
