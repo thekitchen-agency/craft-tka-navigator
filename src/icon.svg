@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Premium Squircle Background using a solid, base-URL-safe brand Indigo -->
+  <rect width="128" height="128" rx="34" fill="#4f46e5" />
+
+  <!-- Sitemap Hierarchical Vector Graphic (Fully immune to base-URL/gradient bugs) -->
+  <g>
+    <!-- Connection lines -->
+    <g stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.95">
+      <!-- Main Left Branch -->
+      <path d="M 64 36 C 64 54, 32 50, 32 68" />
+      <!-- Main Center Line -->
+      <line x1="64" y1="36" x2="64" y2="68" />
+      <!-- Main Right Branch -->
+      <path d="M 64 36 C 64 54, 96 50, 96 68" />
+      
+      <!-- Sub-branches under Left Node -->
+      <path d="M 32 72 C 32 84, 16 84, 16 96" />
+      <path d="M 32 72 C 32 84, 48 84, 48 96" />
+    </g>
+
+    <!-- Glowing Node Points -->
+    <!-- Root Node (Top) -->
+    <circle cx="64" cy="32" r="9" fill="#ffffff" />
+    <circle cx="64" cy="32" r="14" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.4" />
+    
+    <!-- First Level Nodes (Middle) -->
+    <circle cx="32" cy="70" r="6" fill="#ffffff" />
+    <circle cx="64" cy="70" r="6" fill="#ffffff" />
+    <circle cx="96" cy="70" r="6" fill="#ffffff" />
+    
+    <!-- Second Level Nodes (Bottom Nested) -->
+    <circle cx="16" cy="98" r="4.5" fill="#ffffff" />
+    <circle cx="48" cy="98" r="4.5" fill="#ffffff" />
+  </g>
+</svg>

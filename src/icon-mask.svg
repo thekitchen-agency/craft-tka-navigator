@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Stroke-free sitemap connection lines built with solid filled shapes -->
+  <g fill="#000000">
+    <!-- Top-to-Bottom vertical trunk line -->
+    <rect x="61.5" y="32" width="5" height="38" rx="2.5" />
+    
+    <!-- Curved Left Branch -->
+    <path d="M 66.5 36 C 66.5 52, 34.5 48, 34.5 68 L 29.5 68 C 29.5 48, 61.5 52, 61.5 36 Z" />
+             
+    <!-- Curved Right Branch -->
+    <path d="M 66.5 36 C 66.5 52, 98.5 48, 98.5 68 L 93.5 68 C 93.5 48, 61.5 52, 61.5 36 Z" />
+             
+    <!-- Curved Nested Left Branch -->
+    <path d="M 34.5 72 C 34.5 82, 18.5 82, 18.5 96 L 13.5 96 C 13.5 82, 29.5 82, 29.5 72 Z" />
+             
+    <!-- Curved Nested Right Branch -->
+    <path d="M 34.5 72 C 34.5 82, 50.5 82, 50.5 96 L 45.5 96 C 45.5 82, 29.5 82, 29.5 72 Z" />
+
+    <!-- Node Points -->
+    <!-- Root Node (Top) -->
+    <circle cx="64" cy="32" r="10.5" />
+    
+    <!-- First Level Nodes (Middle) -->
+    <circle cx="32" cy="70" r="7.5" />
+    <circle cx="64" cy="70" r="7.5" />
+    <circle cx="96" cy="70" r="7.5" />
+    
+    <!-- Second Level Nodes (Bottom Nested) -->
+    <circle cx="16" cy="98" r="6" />
+    <circle cx="48" cy="98" r="6" />
+  </g>
+</svg>
