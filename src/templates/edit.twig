@@ -931,12 +931,11 @@ $(function() {
         };
         nodes.push(newNode);
         renderTree();
-        openEditor(newNode.id);
+        $(`.tka-row-label[data-id="${newNode.id}"]`).focus().select();
     });
 
-    // Add Child Link
     $(document).on('click', '.btn-add-child', function() {
-        const parentId = $(this).closest('.tka-node-item').data('id');
+        const parentId = $(this).closest('.tka-node-row').data('id');
         const found = findNodeAndParent(nodes, parentId);
         if (found) {
             const maxDepth = {{ settings.maxDepth|json_encode }};
@@ -965,160 +964,381 @@ $(function() {
             if (!found.node.children) found.node.children = [];
             found.node.children.push(newNode);
             renderTree();
-            openEditor(newNode.id);
+            $(`.tka-row-label[data-id="${newNode.id}"]`).focus().select();
         }
     });
 
-    // Delete Link
     $(document).on('click', '.btn-delete-node', function() {
-        const id = $(this).closest('.tka-node-item').data('id');
+        const id = $(this).closest('.tka-node-row').data('id');
         const found = findNodeAndParent(nodes, id);
         if (found) {
             if (confirm(Craft.t('tka-navigation', 'Are you sure you want to delete this link and all its children?'))) {
                 found.siblings.splice(found.index, 1);
-                if (currentEditingNodeId === id) {
-                    closeEditor();
-                }
                 renderTree();
             }
         }
     });
 
-    // 6. Link Settings Form Editor Panel Control
-    const $panel = $('#node-editor-panel');
-    const $typeSelect = $('#node-type');
-    const $entryWrapper = $('#field-entry-wrapper');
-    const $urlWrapper = $('#field-url-wrapper');
-    const $anchorWrapper = $('#field-anchor-wrapper');
-    const $urlLabel = $('#url-label');
-
-    let selectedEntryId = null;
-    let selectedEntryTitle = null;
-
-    function openEditor(nodeId) {
-        currentEditingNodeId = nodeId;
-        const found = findNodeAndParent(nodes, nodeId);
-        if (!found) return;
-
-        const node = found.node;
-
-        // Reset display fields
-        $typeSelect.val(node.type);
-        $('#node-label').val(node.customLabel || '');
-        $('#node-url').val(node.url || '');
-        $('#node-anchor').val(node.anchor || '');
-        $('#node-css-class').val(node.cssClass || '');
-        setSwitchState(node.newTab || false);
-
-        selectedEntryId = node.entryId;
-        selectedEntryTitle = preloadedEntryNames[node.entryId] || node.entryTitle || '';
-
-        updateFormFieldsVisibility();
-        renderTree(); // Highlight active node
-        $panel.fadeIn(150);
-    }
-
-    function closeEditor() {
-        currentEditingNodeId = null;
-        $panel.fadeOut(150);
-        renderTree();
-    }
-
-    function updateFormFieldsVisibility() {
-        const type = $typeSelect.val();
-        $entryWrapper.addClass('hidden').hide();
-        $urlWrapper.addClass('hidden').hide();
-        $anchorWrapper.addClass('hidden').hide();
-
-        if (type === 'entry') {
-            $entryWrapper.removeClass('hidden').show();
-            updateEntryDisplay();
-        } else if (type === 'url') {
-            $urlWrapper.removeClass('hidden').show();
-            $urlLabel.text(Craft.t('tka-navigation', 'Custom Path / URL'));
-        } else if (type === 'anchor') {
-            $entryWrapper.removeClass('hidden').show();
-            $anchorWrapper.removeClass('hidden').show();
-            updateEntryDisplay();
-        } else if (type === 'external') {
-            $urlWrapper.removeClass('hidden').show();
-            $urlLabel.text(Craft.t('tka-navigation', 'External URL'));
+    // 7. Inline Input Bindings & Real-Time Sync
+    $(document).on('input', '.tka-row-label', function() {
+        const id = $(this).data('id');
+        const val = $(this).val();
+        const found = findNodeAndParent(nodes, id);
+        if (found) {
+            found.node.customLabel = val;
+            $('#nodes-json').val(JSON.stringify(nodes));
         }
-    }
-
-    function updateEntryDisplay() {
-        if (selectedEntryId) {
-            $('#selected-entry-display').text(selectedEntryTitle || 'Entry ID: ' + selectedEntryId).css('color', '#0f172a');
-            $('#clear-entry-btn').removeClass('hidden').show();
-        } else {
-            $('#selected-entry-display').text(Craft.t('tka-navigation', 'No entry selected')).css('color', '#94a3b8');
-            $('#clear-entry-btn').addClass('hidden').hide();
-        }
-    }
-
-    $typeSelect.on('change', function() {
-        updateFormFieldsVisibility();
-        {% if settings.defaultExternalNewTab %}
-        if ($typeSelect.val() === 'external') {
-            setSwitchState(true);
-        }
-        {% endif %}
     });
 
-    // Click trigger for Select Entry
-    $('#select-entry-btn').on('click', function() {
+    $(document).on('input', '.tka-row-url', function() {
+        const id = $(this).data('id');
+        const val = $(this).val();
+        const found = findNodeAndParent(nodes, id);
+        if (found) {
+            found.node.url = val;
+            $('#nodes-json').val(JSON.stringify(nodes));
+        }
+    });
+
+    $(document).on('input', '.tka-row-anchor', function() {
+        const id = $(this).data('id');
+        const val = $(this).val();
+        const found = findNodeAndParent(nodes, id);
+        if (found) {
+            found.node.anchor = val;
+            $('#nodes-json').val(JSON.stringify(nodes));
+        }
+    });
+
+    $(document).on('input', '.tka-row-css', function() {
+        const id = $(this).data('id');
+        const val = $(this).val();
+        const found = findNodeAndParent(nodes, id);
+        if (found) {
+            found.node.cssClass = val;
+            $('#nodes-json').val(JSON.stringify(nodes));
+        }
+    });
+
+    $(document).on('change', '.tka-row-checkbox', function() {
+        const id = $(this).data('id');
+        const checked = $(this).is(':checked');
+        const found = findNodeAndParent(nodes, id);
+        if (found) {
+            found.node.newTab = checked;
+            $(this).closest('.tka-row-toggle').toggleClass('is-checked', checked);
+            $('#nodes-json').val(JSON.stringify(nodes));
+        }
+    });
+
+    $(document).on('change', '.tka-row-type-select', function() {
+        const id = $(this).data('id');
+        const type = $(this).val();
+        const found = findNodeAndParent(nodes, id);
+        if (found) {
+            found.node.type = type;
+            if (type === 'external') {
+                found.node.newTab = true; // Auto-enable tab for external links
+            }
+            renderTree();
+            $(`.tka-row-label[data-id="${id}"]`).focus();
+        }
+    });
+
+    // In-Place Element Selection Modal trigger on Badge Pill click
+    $(document).on('click', '.tka-row-entry-pill', function(e) {
+        const id = $(this).data('id');
+        const found = findNodeAndParent(nodes, id);
+        if (!found) return;
+
+        if ($(e.target).hasClass('tka-row-entry-pill-clear')) {
+            e.stopPropagation();
+            found.node.entryId = null;
+            found.node.entryTitle = '';
+            renderTree();
+            return;
+        }
+
         Craft.createElementSelectorModal('craft\\elements\\Entry', {
             multiSelect: false,
             onSelect: function(entries) {
                 if (entries.length > 0) {
                     const entry = entries[0];
-                    selectedEntryId = entry.id;
-                    selectedEntryTitle = entry.label;
-                    preloadedEntryNames[entry.id] = entry.label; // Preload it
-                    updateEntryDisplay();
+                    found.node.entryId = entry.id;
+                    found.node.entryTitle = entry.label;
+                    preloadedEntryNames[entry.id] = entry.label; // Cache title locally
+                    renderTree();
                 }
             }
         });
     });
 
-    // Clear Entry selection
-    $('#clear-entry-btn').on('click', function() {
-        selectedEntryId = null;
-        selectedEntryTitle = null;
-        updateEntryDisplay();
-    });
+    // 8. Keyboard Tree Mutators Logic
+    function indentNode(nodeId) {
+        const found = findNodeAndParent(nodes, nodeId);
+        if (!found) return false;
+        
+        const { node, index, siblings } = found;
+        if (index === 0) return false;
+        
+        const prevSibling = siblings[index - 1];
+        
+        const maxDepth = {{ settings.maxDepth|json_encode }};
+        if (maxDepth > 0) {
+            const targetDepth = getNodeDepth(nodes, prevSibling.id);
+            const draggedHeight = getNodeHeight(node);
+            if (targetDepth + draggedHeight > maxDepth) {
+                Craft.cp.displayError(Craft.t('tka-navigation', 'Maximum nesting depth limit of {max} reached.', {
+                    max: maxDepth
+                }));
+                return false;
+            }
+        }
+        
+        siblings.splice(index, 1);
+        if (!prevSibling.children) {
+            prevSibling.children = [];
+        }
+        prevSibling.children.push(node);
+        return true;
+    }
 
-    // Save Node Details Panel changes
-    $('#save-node-btn').on('click', function() {
-        if (!currentEditingNodeId) return;
+    function outdentNode(nodeId) {
+        const found = findNodeAndParent(nodes, nodeId);
+        if (!found) return false;
+        
+        const { node, parent, index, siblings } = found;
+        if (!parent) return false;
+        
+        const parentFound = findNodeAndParent(nodes, parent.id);
+        if (!parentFound) return false;
+        
+        siblings.splice(index, 1);
+        parentFound.siblings.splice(parentFound.index + 1, 0, node);
+        return true;
+    }
 
-        const found = findNodeAndParent(nodes, currentEditingNodeId);
-        if (found) {
-            const node = found.node;
-            node.type = $typeSelect.val();
-            node.customLabel = $('#node-label').val();
-            node.url = $('#node-url').val();
-            node.anchor = $('#node-anchor').val();
-            node.cssClass = $('#node-css-class').val() || '';
-            node.newTab = $switch.attr('aria-checked') === 'true';
-            node.entryId = selectedEntryId;
-            node.entryTitle = selectedEntryTitle;
+    function moveNodeUp(nodeId) {
+        const found = findNodeAndParent(nodes, nodeId);
+        if (!found) return false;
+        
+        const { index, siblings } = found;
+        if (index === 0) return false;
+        
+        const temp = siblings[index];
+        siblings[index] = siblings[index - 1];
+        siblings[index - 1] = temp;
+        return true;
+    }
 
-            closeEditor();
+    function moveNodeDown(nodeId) {
+        const found = findNodeAndParent(nodes, nodeId);
+        if (!found) return false;
+        
+        const { index, siblings } = found;
+        if (index === siblings.length - 1) return false;
+        
+        const temp = siblings[index];
+        siblings[index] = siblings[index + 1];
+        siblings[index + 1] = temp;
+        return true;
+    }
+
+    function spawnSibling(nodeId) {
+        const found = findNodeAndParent(nodes, nodeId);
+        if (!found) return null;
+        
+        const { index, siblings } = found;
+        const newNode = {
+            id: generateId(),
+            type: 'entry',
+            entryId: null,
+            entryTitle: '',
+            customLabel: '',
+            url: '',
+            anchor: '',
+            newTab: {{ settings.defaultExternalNewTab ? 'true' : 'false' }},
+            cssClass: '',
+            children: []
+        };
+        
+        siblings.splice(index + 1, 0, newNode);
+        return newNode;
+    }
+
+    // Execute Mutation & Restore caret cursor focus states seamlessly
+    function runTreeMutation(callback, activeInputEl) {
+        let focusState = null;
+        if (activeInputEl) {
+            const $el = $(activeInputEl);
+            focusState = {
+                id: $el.closest('.tka-node-row').data('id'),
+                selector: $el.hasClass('tka-row-label') ? '.tka-row-label' : 
+                          $el.hasClass('tka-row-url') ? '.tka-row-url' :
+                          $el.hasClass('tka-row-anchor') ? '.tka-row-anchor' :
+                          $el.hasClass('tka-row-css') ? '.tka-row-css' : null,
+                selectionStart: activeInputEl.selectionStart,
+                selectionEnd: activeInputEl.selectionEnd
+            };
+        }
+        
+        const changed = callback();
+        
+        if (changed) {
+            renderTree();
+            
+            if (focusState && focusState.selector) {
+                const $target = $(`${focusState.selector}[data-id="${focusState.id}"]`);
+                if ($target.length) {
+                    $target.focus();
+                    try {
+                        $target[0].setSelectionRange(focusState.selectionStart, focusState.selectionEnd);
+                    } catch (e) {}
+                }
+            }
+        }
+    }
+
+    $(document).on('keydown', '.tka-row-input', function(e) {
+        const id = $(this).closest('.tka-node-row').data('id');
+        
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                runTreeMutation(() => outdentNode(id), this);
+            } else {
+                runTreeMutation(() => indentNode(id), this);
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const newNode = spawnSibling(id);
+            if (newNode) {
+                renderTree();
+                const $newInput = $(`.tka-row-label[data-id="${newNode.id}"]`);
+                if ($newInput.length) {
+                    $newInput.focus().select();
+                }
+            }
+        } else if (e.altKey && e.key === 'ArrowUp') {
+            e.preventDefault();
+            runTreeMutation(() => moveNodeUp(id), this);
+        } else if (e.altKey && e.key === 'ArrowDown') {
+            e.preventDefault();
+            runTreeMutation(() => moveNodeDown(id), this);
         }
     });
 
-    // Cancel / Close settings panel
-    $('#cancel-node-btn').on('click', closeEditor);
-
-    // Edit link click in list
-    $(document).on('click', '.btn-edit-node', function() {
-        const id = $(this).closest('.tka-node-item').data('id');
-        openEditor(id);
+    // 9. Bulk Add Popover Dialog Logic
+    const $bulkModal = $('#bulk-add-modal');
+    const $bulkTextarea = $('#bulk-import-textarea');
+    
+    $('#bulk-add-btn').on('click', function() {
+        $bulkModal.css('display', 'flex').hide().fadeIn(200);
+        $bulkTextarea.val('');
+    });
+    
+    function closeBulkModal() {
+        $bulkModal.fadeOut(200);
+    }
+    
+    $('#close-bulk-modal-btn, #bulk-add-modal-backdrop, #bulk-modal-cancel-btn').on('click', closeBulkModal);
+    
+    $('.bulk-tab-btn').on('click', function() {
+        const tab = $(this).data('tab');
+        $('.bulk-tab-btn').removeClass('active').css({ 'border-bottom-color': 'transparent', 'color': '#64748b' });
+        $(this).addClass('active').css({ 'border-bottom-color': '#3b82f6', 'color': '#3b82f6' });
+        
+        if (tab === 'entries') {
+            $('#bulk-tab-entries').show();
+            $('#bulk-tab-text').hide();
+            $('#bulk-modal-import-btn').hide();
+        } else {
+            $('#bulk-tab-entries').hide();
+            $('#bulk-tab-text').show();
+            $('#bulk-modal-import-btn').show();
+        }
     });
 
-    // Initial render call
+    // Bulk Select Entries Modal
+    $('#bulk-select-entries-trigger').on('click', function() {
+        // Temporarily hide the bulk modal to avoid z-index/overlay conflicts
+        $bulkModal.hide();
+        let entriesSelected = false;
+
+        Craft.createElementSelectorModal('craft\\elements\\Entry', {
+            multiSelect: true,
+            onSelect: function(entries) {
+                if (entries.length > 0) {
+                    entriesSelected = true;
+                    entries.forEach(entry => {
+                        const newNode = {
+                            id: generateId(),
+                            type: 'entry',
+                            entryId: entry.id,
+                            entryTitle: entry.label,
+                            customLabel: '',
+                            url: '',
+                            anchor: '',
+                            newTab: false,
+                            cssClass: '',
+                            children: []
+                        };
+                        preloadedEntryNames[entry.id] = entry.label;
+                        nodes.push(newNode);
+                    });
+                    renderTree();
+                    closeBulkModal();
+                }
+            },
+            onHide: function() {
+                // If they cancelled or closed without selecting, restore the bulk modal smoothly
+                if (!entriesSelected) {
+                    $bulkModal.fadeIn(200);
+                }
+            }
+        });
+    });
+
+    // Bulk Import Plain Text Parser
+    $('#bulk-modal-import-btn').on('click', function() {
+        const text = $bulkTextarea.val() || '';
+        const lines = text.split('\n');
+        let addedCount = 0;
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return;
+            
+            let label = trimmed;
+            let url = '/';
+            if (trimmed.includes('|')) {
+                const parts = trimmed.split('|');
+                label = parts[0].trim();
+                url = parts[1].trim();
+            }
+            
+            const newNode = {
+                id: generateId(),
+                type: url.startsWith('http://') || url.startsWith('https://') ? 'external' : 'url',
+                entryId: null,
+                entryTitle: '',
+                customLabel: label,
+                url: url,
+                anchor: '',
+                newTab: false,
+                cssClass: '',
+                children: []
+            };
+            nodes.push(newNode);
+            addedCount++;
+        });
+        
+        if (addedCount > 0) {
+            renderTree();
+        }
+        closeBulkModal();
+    });
+
+    // Initial render trigger on page load
     renderTree();
 });
 {% endjs %}
-
