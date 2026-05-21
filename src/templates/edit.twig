@@ -35,13 +35,10 @@
 ] %}
 
 {% set content %}
-    <!-- Custom CSS Styling for Premium visual identity -->
+    <!-- Custom CSS Styling for Premium Compact Visual Tree Editor -->
     <style>
         .tka-main-container {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 28px;
-            align-items: start;
+            display: block;
         }
 
         .tka-card {
@@ -105,23 +102,23 @@
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
         }
 
         .tka-tree-list .tka-tree-list {
-            padding-left: 36px;
-            margin-top: 10px;
+            padding-left: 28px;
+            margin-top: 6px;
             position: relative;
         }
 
-        /* Beautiful gradient line guides for visual depth */
+        /* Gradient line guides for visual depth linking */
         .tka-tree-list .tka-tree-list::before {
             content: '';
             position: absolute;
-            left: 14px;
-            top: -10px;
-            bottom: 22px;
-            width: 2px;
+            left: -16px;
+            top: -6px;
+            bottom: 20px;
+            width: 1.5px;
             background: linear-gradient(180deg, #cbd5e1 0%, rgba(203, 213, 225, 0.15) 100%);
             border-radius: 1px;
         }
@@ -380,10 +377,10 @@
         <input type="hidden" name="nodes" id="nodes-json" value="{{ navigation.nodes ? navigation.nodes|json_encode : '[]' }}">
 
         <div class="tka-main-container">
-            <!-- Left Side: Basic Fields & Tree Builder -->
+            <!-- Full-width visual workspace card -->
             <div style="display: flex; flex-direction: column; gap: 24px;">
                 <div class="tka-card">
-                    <!-- Basic details block -->
+                    <!-- Standard Navigation Fields -->
                     <div class="tka-fields-row">
                         {{ forms.textField({
                             label: 'Title'|t,
