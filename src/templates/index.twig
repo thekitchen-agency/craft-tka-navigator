@@ -1,0 +1,131 @@
+{% extends "_layouts/cp" %}
+{% set title = "Navigations"|t('tka-navigation') %}
+
+{% block actionButton %}
+    <a href="{{ url('tka-navigation/new') }}" class="btn submit add icon" style="border-radius: 8px; padding: 10px 20px; font-weight: 500;">{{ "New Navigation"|t('tka-navigation') }}</a>
+{% endblock %}
+
+{% set content %}
+    <style>
+        .tka-index-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .tka-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .tka-table th {
+            background: #f8fafc;
+            padding: 16px 20px;
+            font-weight: 600;
+            color: #475569;
+            font-size: 13px;
+            border-bottom: 1.5px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .tka-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+            color: #334155;
+            transition: all 0.15s ease;
+        }
+
+        .tka-row {
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+
+        .tka-row:hover {
+            background: #f8fafc;
+        }
+
+        .tka-badge {
+            background: #e2e8f0;
+            color: #475569;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .tka-nav-title-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.15s ease;
+        }
+
+        .tka-nav-title-link:hover {
+            color: #3730a3;
+        }
+
+        /* Floating animation for empty state illustration */
+        @keyframes tka-empty-float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+    </style>
+
+    <!-- Empty State -->
+    <div id="no-navigations" class="{% if navigations|length %}hidden{% endif %}" style="text-align: center; padding: 64px 32px; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); max-width: 600px; margin: 40px auto; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div style="font-size: 56px; margin-bottom: 8px; animation: tka-empty-float 3.5s ease-in-out infinite;">🗺️</div>
+        <h3 style="margin: 0; color: #0f172a; font-size: 18px; font-weight: 600;">{{ "No navigations yet"|t('tka-navigation') }}</h3>
+        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 14px; max-width: 360px; line-height: 1.5;">{{ "Create your first navigation menu to structure and manage your site's links easily."|t('tka-navigation') }}</p>
+        <a href="{{ url('tka-navigation/new') }}" class="btn primary add icon" style="border-radius: 8px; padding: 10px 20px; font-weight: 500;">{{ "Create a Navigation"|t('tka-navigation') }}</a>
+    </div>
+
+    <!-- Active Table View -->
+    {% if navigations|length %}
+        <div class="tka-index-card">
+            <table class="tka-table">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 45%;">{{ "Name"|t }}</th>
+                        <th scope="col" style="width: 35%;">{{ "Handle"|t }}</th>
+                        <th scope="col" style="width: 20%; text-align: right;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for navigation in navigations %}
+                        <tr class="tka-row" data-id="{{ navigation.id }}" data-name="{{ navigation.title }}">
+                            <td>
+                                <a href="{{ url('tka-navigation/edit/' ~ navigation.id) }}" class="tka-nav-title-link">
+                                    <span style="font-size: 18px;">📂</span>
+                                    <span>{{ navigation.title }}</span>
+                                </a>
+                            </td>
+                            <td>
+                                <span class="tka-badge">{{ navigation.handle }}</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <div style="display: flex; justify-content: flex-end; gap: 8px; align-items: center;">
+                                    <a href="{{ url('tka-navigation/edit/' ~ navigation.id) }}" class="btn small" style="border-radius: 6px; font-weight: 500;">{{ 'Edit'|t }}</a>
+                                    <form method="post" action="{{ actionUrl('tka-navigation/navigation/delete') }}" class="delete-form" onsubmit="return confirm('{{ 'Are you sure you want to delete this navigation?'|t('tka-navigation') }}');" style="display: inline; margin: 0;">
+                                        {{ csrfInput() }}
+                                        <input type="hidden" name="id" value="{{ navigation.id }}">
+                                        <input type="submit" class="btn small delete" value="{{ 'Delete'|t }}" style="border-radius: 6px; font-weight: 500;">
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endset %}
+
