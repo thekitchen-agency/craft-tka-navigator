@@ -685,18 +685,13 @@ $(function() {
         `;
     }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
-
-    // 3. Render Tree Main Trigger
+    // 3. Render Tree Main Engine
     function renderTree() {
         const container = $('#tree-container');
         if (nodes.length === 0) {
             container.html(`
                 <div style="text-align: center; padding: 48px 24px; color: #64748b; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                    <div style="font-size: 40px; margin-bottom: 8px; animation: tka-float 3s ease-in-out infinite;">🗺️</div>
+                    <div style="font-size: 40px; margin-bottom: 8px;">🗺️</div>
                     <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #0f172a;">${Craft.t('tka-navigation', 'No links built yet')}</h4>
                     <p style="margin: 0; max-width: 280px; font-size: 13px; color: #64748b; line-height: 1.5;">
                         ${Craft.t('tka-navigation', 'Click "Add Link" to start creating your beautiful structured menu.')}
@@ -714,15 +709,14 @@ $(function() {
         treeHtml += '</ul>';
         container.html(treeHtml);
 
-        // Serialize state to hidden field
+        // Serialize state straight into the hidden inputs field
         $('#nodes-json').val(JSON.stringify(nodes));
 
-        // Proactively set up native HTML5 Drag and Drop events
+        // Bind drag and drop events to rendered rows
         setupDragAndDrop();
     }
 
-    // 4. Tree Manipulation Operations
-    // Find node and its parent, index
+    // 4. Tree Search & Tree Calculation Helpers
     function findNodeAndParent(list, nodeId, parent = null) {
         for (let i = 0; i < list.length; i++) {
             if (list[i].id === nodeId) {
@@ -736,7 +730,7 @@ $(function() {
         return null;
     }
 
-    // Protection to block circular nesting (cannot drag a parent node into its own descendant)
+    // Prevent recursive depth feedback loops
     function isDescendant(parentNode, targetId) {
         if (!parentNode.children) return false;
         for (let child of parentNode.children) {
@@ -746,7 +740,6 @@ $(function() {
         return false;
     }
 
-    // Calculate the current depth of a node in the tree (1-indexed, root nodes are depth 1)
     function getNodeDepth(list, nodeId, currentDepth = 1) {
         for (let node of list) {
             if (node.id === nodeId) {
@@ -760,7 +753,6 @@ $(function() {
         return null;
     }
 
-    // Calculate the height of a sub-tree (root only is height 1, root + child is height 2, etc.)
     function getNodeHeight(node) {
         if (!node.children || node.children.length === 0) {
             return 1;
@@ -775,11 +767,11 @@ $(function() {
         return 1 + maxChildHeight;
     }
 
-    // 5. Native HTML5 Drag and Drop Engine
+    // 5. High-Precision Drag & Drop Implementation
     let draggedNodeId = null;
 
     function setupDragAndDrop() {
-        const items = document.querySelectorAll('.tka-node-item');
+        const items = document.querySelectorAll('.tka-node-row');
         const container = document.querySelector('#tree-container');
 
         items.forEach(item => {
@@ -797,10 +789,8 @@ $(function() {
                 e.preventDefault();
                 const targetId = this.dataset.id;
 
-                // Stop if dragging over yourself
                 if (targetId === draggedNodeId) return;
 
-                // Stop if dragging a parent into one of its children
                 const dragged = findNodeAndParent(nodes, draggedNodeId);
                 if (dragged && isDescendant(dragged.node, targetId)) {
                     e.dataTransfer.dropEffect = 'none';
@@ -813,14 +803,15 @@ $(function() {
                 const relativeY = e.clientY - rect.top;
                 const pctY = relativeY / rect.height;
 
+                // Thresholds to support precise dropping guidelines on a slim 40px grid
                 let position = 'inside';
-                if (pctY < 0.33) {
+                if (pctY < 0.25) {
                     position = 'before';
-                } else if (pctY > 0.66) {
+                } else if (pctY > 0.75) {
                     position = 'after';
                 }
 
-                // Check depth limit
+                // Check depth limits dynamically
                 const maxDepth = {{ settings.maxDepth|json_encode }};
                 if (maxDepth > 0 && dragged) {
                     const targetDepth = getNodeDepth(nodes, targetId);
@@ -860,7 +851,6 @@ $(function() {
 
                 if (isDescendant(dragged.node, targetId)) return;
 
-                // Determine position based on hover classes
                 let position = 'inside';
                 if (this.classList.contains('drag-over-before')) {
                     position = 'before';
@@ -868,7 +858,6 @@ $(function() {
                     position = 'after';
                 }
 
-                // Check depth limit
                 const maxDepth = {{ settings.maxDepth|json_encode }};
                 if (maxDepth > 0) {
                     const targetDepth = getNodeDepth(nodes, targetId);
@@ -886,11 +875,9 @@ $(function() {
 
                 this.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-inside');
 
-                // Perform list mutation
-                // 1. Splice item out from original parent list
+                // Perform list mutations
                 dragged.siblings.splice(dragged.index, 1);
 
-                // 2. Find target in updated tree & insert
                 const target = findNodeAndParent(nodes, targetId);
                 if (target) {
                     if (position === 'inside') {
@@ -905,7 +892,12 @@ $(function() {
                     }
                 }
 
-                renderTree();
+                if (container) {
+                    container.classList.remove('is-dragging-active');
+                }
+                setTimeout(function() {
+                    renderTree();
+                }, 50);
             });
 
             item.addEventListener('dragend', function() {
@@ -916,14 +908,14 @@ $(function() {
                 if (container) {
                     container.classList.remove('is-dragging-active');
                 }
-                document.querySelectorAll('.tka-node-item').forEach(el => {
+                document.querySelectorAll('.tka-node-row').forEach(el => {
                     el.classList.remove('drag-over-before', 'drag-over-after', 'drag-over-inside');
                 });
             });
         });
     }
 
-    // Add Root Link
+    // 6. Tree Mutations Handlers
     $('#add-root-btn').on('click', function() {
         const newNode = {
             id: generateId(),
