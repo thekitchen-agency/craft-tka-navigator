@@ -1,0 +1,48 @@
+{
+  "name": "thekitchen-agency/craft-tka-navigation",
+  "description": "A simple Navigation Plugin for all your Navigational needs",
+  "type": "craft-plugin",
+  "license": "proprietary",
+  "support": {
+    "email": "tech@thekitchen.agency",
+    "issues": "https://github.com/thekitchen-agency/craft-tka-navigator/issues?state=open",
+    "source": "https://github.com/thekitchen-agency/craft-tka-navigator",
+    "docs": "https://github.com/thekitchen-agency/craft-tka-navigator",
+    "rss": "https://github.com/thekitchen-agency/craft-tka-navigator/releases.atom"
+  },
+  "require": {
+    "php": ">=8.2",
+    "craftcms/cms": "^5.10.0"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main"
+  },
+  "autoload": {
+    "psr-4": {
+      "thekitchenagency\\crafttkanavigation\\": "src/"
+    }
+  },
+  "extra": {
+    "handle": "tka-navigation",
+    "name": "tka navigation",
+    "developer": "thekitchen.agency",
+    "documentationUrl": "https://github.com/thekitchen-agency/craft-tka-navigator",
+    "class": "thekitchenagency\\crafttkanavigation\\TKANavigator"
+  },
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix",
+    "phpstan": "phpstan --memory-limit=1G"
+  },
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.2"
+    },
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
+  }
+}
