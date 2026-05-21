@@ -474,174 +474,142 @@
 
                     <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;">
 
-                    <!-- Structure Builder Header -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                    <!-- Structure Header & Actions -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
                         <h3 style="margin: 0; font-size: 15px; font-weight: 600; color: #0f172a;">{{ "Navigation Structure"|t('tka-navigation') }}</h3>
-                        <button type="button" class="btn submit add icon" id="add-root-btn" style="border-radius: 8px;">{{ "Add Link"|t('tka-navigation') }}</button>
+                        
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn submit add icon" id="add-root-btn" style="border-radius: 8px;">{{ "Add Link"|t('tka-navigation') }}</button>
+                            <button type="button" class="btn" id="bulk-add-btn" style="border-radius: 8px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.15s ease;">
+                                ⚡ {{ "Bulk Add"|t('tka-navigation') }}
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Beautiful Tree Container -->
+                    <!-- Tree Container Workspace -->
                     <div id="tree-container" class="tka-tree-wrapper">
-                        <!-- Dynamic node elements nested recursively will render here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Side: Node Details Inspector Panel -->
-            <div class="tka-card" id="node-editor-panel" style="display: none;">
-                <h3 class="tka-inspector-header">
-                    <span>⚙️</span> {{ "Link Settings"|t('tka-navigation') }}
-                </h3>
-
-                <div style="display: flex; flex-direction: column; gap: 18px;">
-                    <!-- Link Type -->
-                    <div>
-                        <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Link Type"|t('tka-navigation') }}</label>
-                        <select id="node-type" class="select" style="width: 100%; border-radius: 6px;">
-                            <option value="entry">{{ "Craft Entry"|t('tka-navigation') }}</option>
-                            <option value="url">{{ "Custom URL"|t('tka-navigation') }}</option>
-                            <option value="anchor">{{ "Anchor inside Page"|t('tka-navigation') }}</option>
-                            <option value="external">{{ "External URL"|t('tka-navigation') }}</option>
-                        </select>
-                    </div>
-
-                    <!-- Entry Selection -->
-                    <div id="field-entry-wrapper">
-                        <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Select Entry"|t('tka-navigation') }}</label>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <button type="button" class="btn" id="select-entry-btn" style="border-radius: 6px;">{{ "Select Entry"|t('tka-navigation') }}</button>
-                            <span id="selected-entry-display" style="font-size: 12px; color: #64748b; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px;">{{ "No entry selected"|t('tka-navigation') }}</span>
-                            <button type="button" class="btn small delete hidden" id="clear-entry-btn" style="border-radius: 6px;">×</button>
-                        </div>
-                    </div>
-
-                    <!-- URL / Custom URL Input -->
-                    <div id="field-url-wrapper">
-                        <label class="label" id="url-label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "URL"|t('tka-navigation') }}</label>
-                        <input type="text" id="node-url" class="text" style="width: 100%; border-radius: 6px;" placeholder="/about-us or https://...">
-                    </div>
-
-                    <!-- Anchor Input -->
-                    <div id="field-anchor-wrapper">
-                        <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Anchor"|t('tka-navigation') }}</label>
-                        <input type="text" id="node-anchor" class="text" style="width: 100%; border-radius: 6px;" placeholder="#contact-form">
-                    </div>
-
-                    <!-- Custom Label -->
-                    <div>
-                        <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Custom Label"|t('tka-navigation') }}</label>
-                        <input type="text" id="node-label" class="text" style="width: 100%; border-radius: 6px;" placeholder="{{ 'Leave blank to use Entry Title'|t('tka-navigation') }}">
-                    </div>
-
-                    <!-- CSS Class -->
-                    {% if settings.enableCssClasses %}
-                    <div>
-                        <label class="label" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: #475569;">{{ "Custom CSS Class"|t('tka-navigation') }}</label>
-                        <input type="text" id="node-css-class" class="text" style="width: 100%; border-radius: 6px;" placeholder="e.g. nav-highlight">
-                    </div>
-                    {% endif %}
-
-                    <!-- Target / Open in New Tab -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid #f1f5f9;">
-                        <span style="font-weight: 500; font-size: 13px; color: #475569;">{{ "Open in New Tab"|t('tka-navigation') }}</span>
-                        <div class="lightswitch" id="node-new-tab-switch" role="checkbox" aria-checked="false" tabindex="0">
-                            <div class="lightswitch-container">
-                                <div class="handle"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-                        <button type="button" class="btn submit primary" id="save-node-btn" style="flex: 1; border-radius: 6px;">{{ "Apply Changes"|t('tka-navigation') }}</button>
-                        <button type="button" class="btn" id="cancel-node-btn" style="border-radius: 6px;">{{ "Close"|t }}</button>
+                        <!-- Populated by JS renderTree -->
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer Actions -->
+        <!-- Submit & Back Buttons -->
         <div class="buttons" style="margin-top: 36px; display: flex; gap: 12px; align-items: center;">
             <button type="submit" class="btn submit primary large tka-btn" style="border-radius: 8px; padding: 0 24px;">{{ 'Save'|t }}</button>
             <a href="{{ url('tka-navigation') }}" class="btn large tka-btn" style="border-radius: 8px; padding: 0 24px;">{{ 'Cancel'|t }}</a>
         </div>
     </form>
+
+    <!-- Bulk Add Modal -->
+    <div id="bulk-add-modal" style="display: none; position: fixed; inset: 0; z-index: 10000; align-items: center; justify-content: center; padding: 24px;">
+        <!-- Modal Backdrop -->
+        <div id="bulk-add-modal-backdrop" style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); transition: all 0.25s ease;"></div>
+        
+        <!-- Modal Card -->
+        <div style="position: relative; background: #ffffff; border-radius: 16px; width: 100%; max-width: 580px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden; animation: tka-modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+            <!-- Modal Header -->
+            <div style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+                <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #0f172a; display: flex; align-items: center; gap: 8px;">⚡ {{ "Bulk Add Links"|t('tka-navigation') }}</h3>
+                <button type="button" id="close-bulk-modal-btn" style="border: none; background: transparent; font-size: 20px; font-weight: 600; color: #94a3b8; cursor: pointer; padding: 4px; transition: color 0.15s ease; outline: none; line-height: 1;">×</button>
+            </div>
+            
+            <!-- Modal Tabs Selection -->
+            <div style="display: flex; border-bottom: 1px solid #e2e8f0; background: #ffffff; padding: 0 24px;">
+                <button type="button" class="bulk-tab-btn active" data-tab="entries" style="background: none; border: none; border-bottom: 2px solid #3b82f6; color: #3b82f6; padding: 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; outline: none;">📄 {{ "Select Craft Entries"|t('tka-navigation') }}</button>
+                <button type="button" class="bulk-tab-btn" data-tab="text" style="background: none; border: none; border-bottom: 2px solid transparent; color: #64748b; padding: 16px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; outline: none;">🔗 {{ "Paste Plain Text Links"|t('tka-navigation') }}</button>
+            </div>
+            
+            <!-- Modal Body Container -->
+            <div style="padding: 24px; flex: 1; min-height: 240px; display: flex; flex-direction: column;">
+                <!-- Tab contents: Entries selector -->
+                <div id="bulk-tab-entries" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; height: 100%; flex: 1; padding: 24px 0;">
+                    <div style="font-size: 48px;">📂</div>
+                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #0f172a;">{{ "Import Multiple Entries"|t('tka-navigation') }}</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #64748b; text-align: center; max-width: 360px; line-height: 1.4;">
+                        {{ "Choose multiple entries from your catalog to instantly add them to the navigation as root-level links."|t('tka-navigation') }}
+                    </p>
+                    <button type="button" class="btn submit primary" id="bulk-select-entries-trigger" style="border-radius: 8px; padding: 0 20px; height: 38px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        🔍 {{ "Select Entries in Bulk"|t('tka-navigation') }}
+                    </button>
+                </div>
+                
+                <!-- Tab contents: Plain text parsing -->
+                <div id="bulk-tab-text" style="display: none; flex-direction: column; gap: 12px; flex: 1;">
+                    <label style="font-weight: 500; font-size: 13px; color: #475569;">{{ "Enter one link per line, formatted as: Label | Path"|t('tka-navigation') }}</label>
+                    <textarea id="bulk-import-textarea" class="text" rows="8" style="width: 100%; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; padding: 12px; border-color: #cbd5e1; box-sizing: border-box;" placeholder="About Us | /about&#10;Our Services | /services&#10;Blog | https://myblog.com"></textarea>
+                    <div style="font-size: 11px; color: #94a3b8; font-style: italic;">
+                        {{ "Example: Home | /"|t('tka-navigation') }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Footer Actions -->
+            <div id="bulk-modal-footer" style="padding: 16px 24px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc;">
+                <button type="button" class="btn" id="bulk-modal-cancel-btn" style="border-radius: 8px;">{{ "Cancel"|t }}</button>
+                <button type="button" class="btn submit primary" id="bulk-modal-import-btn" style="border-radius: 8px; display: none;">{{ "Add to Navigation"|t('tka-navigation') }}</button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes tka-modal-in {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .bulk-tab-btn:hover {
+            color: #3b82f6 !important;
+        }
+        #close-bulk-modal-btn:hover {
+            color: #475569 !important;
+        }
+    </style>
 {% endset %}
 
 {% js %}
 $(function() {
-    // 1. Initial State from JSON input
+    // 1. Core State Initialization
     let nodes = JSON.parse($('#nodes-json').val() || '[]');
-    let currentEditingNodeId = null;
 
-    // Database of preloaded entry titles from PHP to prevent displaying empty IDs
+    // Cache of preloaded entry titles from PHP to prevent displaying raw empty IDs
     const preloadedEntryNames = {{ entryNames|json_encode|raw }};
 
-    // Auto-generate Handle from Title if new navigation
+    // Auto-generate Handle from Title for new navigations
     {% if not navigation.id %}
     var $titleInput = $('#title');
     var $handleInput = $('#handle');
     $titleInput.on('input', function() {
         var slug = Craft.slugify($titleInput.val());
-        // camelCase conversion
         var camelCase = slug.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
         $handleInput.val(camelCase);
     });
     {% endif %}
 
-    // Helper to generate a unique ID
+    // Unique ID generation utility
     function generateId() {
         return 'node_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
     }
 
-    // Toggle logic for the Open in New Tab Switch
-    const $switch = $('#node-new-tab-switch');
-    $switch.on('click', function() {
-        const isChecked = $switch.attr('aria-checked') === 'true';
-        $switch.attr('aria-checked', (!isChecked).toString());
-        $switch.toggleClass('on', !isChecked);
-    });
-    function setSwitchState(state) {
-        $switch.attr('aria-checked', state.toString());
-        $switch.toggleClass('on', state);
+    // HTML escape utility
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // 2. Render Node helper (Recursive to output structured nested HTML tree)
+    // 2. Render Node Helper (Recursive generator for structured tree HTML)
     function renderNode(node, level = 0) {
-        const typeIcons = {
-            entry: '📄',
-            url: '🔗',
-            anchor: '⚓',
-            external: '🌐'
-        };
+        const isEntry = node.type === 'entry';
+        const isAnchor = node.type === 'anchor';
+        const isUrl = node.type === 'url';
+        const isExternal = node.type === 'external';
 
-        const typeLabels = {
-            entry: 'Entry',
-            url: 'Custom URL',
-            anchor: 'Anchor',
-            external: 'External URL'
-        };
-
-        let displayName = node.customLabel || '';
-        if (!displayName && node.type === 'entry' && node.entryId) {
-            displayName = preloadedEntryNames[node.entryId] || node.entryTitle || 'Entry ID: ' + node.entryId;
-        } else if (!displayName) {
-            displayName = node.url || node.anchor || 'Untitled Link';
+        // Select preloaded entry display title
+        let entryText = '';
+        if (isEntry || isAnchor) {
+            entryText = preloadedEntryNames[node.entryId] || node.entryTitle || '';
         }
 
-        let targetInfo = '';
-        if (node.type === 'entry' && node.entryId) {
-            targetInfo = preloadedEntryNames[node.entryId] || node.entryTitle || 'Entry #' + node.entryId;
-        } else if (node.type === 'url' || node.type === 'external') {
-            targetInfo = node.url || '';
-        } else if (node.type === 'anchor') {
-            let entryName = node.entryId ? (preloadedEntryNames[node.entryId] || node.entryTitle || 'Entry #' + node.entryId) : '';
-            targetInfo = (entryName ? entryName + ' ' : '') + (node.anchor || '');
-        }
-
-        const isEditing = currentEditingNodeId === node.id;
-
-        // Render children if any recursively
+        // Recursively render children list
         let childHtml = '';
         if (node.children && node.children.length > 0) {
             childHtml = `
