@@ -127,231 +127,301 @@
             position: relative;
         }
 
-        /* Subtle child item connecting hooks */
-        .tka-tree-list .tka-tree-node::before {
-            content: '';
-            position: absolute;
-            left: -22px;
-            top: 24px;
-            width: 14px;
-            height: 2px;
-            background: #cbd5e1;
-        }
-
-        /* Stunning Premium Node Cards */
-        .tka-node-item {
+        /* Premium Compact 40px Row Items */
+        .tka-node-row {
+            display: flex;
+            align-items: center;
+            height: 40px;
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 14px 20px;
-            display: grid;
-            grid-template-columns: auto auto 1fr auto;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+            border-radius: 8px;
+            padding: 0 12px;
+            gap: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: all 0.15s ease;
             position: relative;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
         }
 
-        .tka-node-item:hover {
+        .tka-node-row:hover {
             border-color: #cbd5e1;
-            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
-            transform: translateY(-1px);
+            background: #f8fafc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
         }
 
-        /* Drag Handles */
-        .tka-drag-handle {
-            cursor: grab;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-            font-size: 18px;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            transition: background 0.15s ease, color 0.15s ease;
-        }
-
-        .tka-drag-handle:hover {
-            background: #f1f5f9;
-            color: #334155;
-        }
-
-        .tka-node-item:active .tka-drag-handle {
-            cursor: grabbing;
-        }
-
-        /* Glowing accents on card edges matching the item categories */
-        .tka-node-item::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 12px;
-            bottom: 12px;
-            width: 4px;
-            border-radius: 0 4px 4px 0;
-            transition: all 0.2s ease;
-        }
-
-        .tka-node-item.type-entry::after { background: #6366f1; }
-        .tka-node-item.type-url::after { background: #10b981; }
-        .tka-node-item.type-anchor::after { background: #f59e0b; }
-        .tka-node-item.type-external::after { background: #0ea5e9; }
-
-        /* Highlight node active editing state */
-        .tka-node-item.is-editing {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12), 0 2px 4px rgba(0, 0, 0, 0.04);
-            background: #fafaff;
-        }
-
-        /* HTML5 Drag & Drop visual highlights - absolutely positioned to prevent layout shift */
-        .tka-node-item.drag-over-before::before {
-            content: '';
-            position: absolute;
-            top: -6px;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #3b82f6;
-            border-radius: 2px;
-            box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
-            z-index: 10;
-        }
-
-        .tka-node-item.drag-over-after::before {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #3b82f6;
-            border-radius: 2px;
-            box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
-            z-index: 10;
-        }
-
-        .tka-node-item.drag-over-inside {
-            background: #eff6ff !important;
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
-            transform: scale(1.012);
-        }
-
-        .tka-tree-node.is-dragging {
+        .tka-node-row.is-dragging {
             opacity: 0.35;
         }
 
-        /* Disable pointer-events on all sub-items during active drag to completely eliminate flickering */
-        .tka-tree-wrapper.is-dragging-active .tka-node-item * {
+        /* Disable pointer-events on child elements during drag to completely eliminate layout flickering */
+        .tka-tree-wrapper.is-dragging-active .tka-node-row * {
             pointer-events: none !important;
         }
+        .tka-tree-wrapper.is-dragging-active .tka-row-drag-handle {
+            pointer-events: auto !important;
+        }
 
-        /* Beautiful round icon frames for link categories */
-        .tka-icon-frame {
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
+        /* Glowing color accents on left edges based on depth level */
+        .tka-node-row::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 4px 0 0 4px;
+        }
+        .tka-node-row.tka-row-depth-0::after { background: #cbd5e1; } /* Slate for root */
+        .tka-node-row.tka-row-depth-1::after { background: #6366f1; } /* Indigo for level 2 */
+        .tka-node-row.tka-row-depth-2::after { background: #10b981; } /* Emerald for level 3 */
+        .tka-node-row.tka-row-depth-3::after { background: #f59e0b; } /* Amber for depth 4+ */
+
+        /* Minimal Drag Handle */
+        .tka-row-drag-handle {
+            cursor: grab;
+            color: #94a3b8;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            transition: transform 0.2s ease;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            transition: background 0.15s ease, color 0.15s ease;
+            user-select: none;
+        }
+        .tka-row-drag-handle:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .tka-node-row:active .tka-row-drag-handle {
+            cursor: grabbing;
         }
 
-        .tka-node-item:hover .tka-icon-frame {
-            transform: scale(1.08);
-        }
-
-        .tka-icon-frame.type-entry { background: #eeeffe; color: #4f46e5; }
-        .tka-icon-frame.type-url { background: #e6fcf5; color: #0891b2; }
-        .tka-icon-frame.type-anchor { background: #fffbeb; color: #d97706; }
-        .tka-icon-frame.type-external { background: #f0f9ff; color: #0284c7; }
-
-        /* Floating animations for empty states */
-        @keyframes tka-float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-6px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* Premium Right Inspector Card */
-        #node-editor-panel {
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            background: #ffffff;
-            position: sticky;
-            top: 24px;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-
-        .tka-inspector-header {
-            font-size: 16px;
-            font-weight: 600;
-            color: #0f172a;
+        /* Content elements grid wrapper */
+        .tka-row-fields {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin: 0 0 20px 0;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 16px;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
         }
 
-        /* Sleek node cards buttons & action buttons */
-        .tka-node-item .btn-edit-node {
-            background: #f1f5f9 !important;
-            color: #334155 !important;
-            border: 1px solid #cbd5e1 !important;
-            box-shadow: none !important;
-            text-shadow: none !important;
-            border-radius: 6px !important;
+        /* Sleek low-profile selects */
+        .tka-row-type-select {
+            border: 1px solid transparent !important;
+            background: transparent !important;
+            font-size: 12px !important;
             font-weight: 500 !important;
+            color: #475569 !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            height: 28px !important;
+            transition: all 0.15s ease !important;
+            outline: none !important;
+            box-shadow: none !important;
+            width: auto !important;
+        }
+        .tka-row-type-select:hover {
+            background: rgba(226, 232, 240, 0.5) !important;
+            color: #0f172a !important;
+        }
+        .tka-row-type-select:focus {
+            border-color: #6366f1 !important;
+            background: #ffffff !important;
+        }
+
+        /* Beautiful interactive Entry Badge Pill */
+        .tka-row-entry-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            max-width: 180px;
+            height: 26px;
+            box-sizing: border-box;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        .tka-row-entry-pill:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+        .tka-row-entry-pill.is-empty {
+            background: #fffbeb;
+            color: #d97706;
+            border-color: #fde68a;
+            border-style: dashed;
+        }
+        .tka-row-entry-pill.is-empty:hover {
+            background: #fef3c7;
+        }
+        .tka-row-entry-pill-clear {
+            font-size: 14px;
+            font-weight: bold;
+            color: #94a3b8;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            transition: all 0.15s ease;
+        }
+        .tka-row-entry-pill-clear:hover {
+            background: #cbd5e1;
+            color: #475569;
+        }
+
+        /* Sleek borderless text fields showing border only on active focus */
+        .tka-row-input {
+            border: 1px solid transparent !important;
+            background: transparent !important;
+            padding: 4px 8px !important;
+            font-size: 13px !important;
+            color: #334155 !important;
+            border-radius: 4px !important;
+            height: 28px !important;
+            transition: all 0.15s ease !important;
+            box-shadow: none !important;
+            flex: 1;
+            min-width: 80px;
+            margin: 0 !important;
+        }
+        .tka-row-input:hover {
+            background: rgba(226, 232, 240, 0.4) !important;
+        }
+        .tka-row-input:focus {
+            border-color: #6366f1 !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1) !important;
+            outline: none !important;
+        }
+
+        .tka-row-label {
+            font-weight: 500;
+        }
+        .tka-row-url, .tka-row-anchor {
+            font-family: monospace;
+            font-size: 12px !important;
+            color: #475569 !important;
+        }
+
+        /* Tiny custom check-glow toggle for target='_blank' */
+        .tka-row-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+        .tka-row-toggle:hover {
+            background: #f1f5f9;
+        }
+        .tka-row-toggle input {
+            display: none !important;
+        }
+        .tka-row-toggle-icon {
+            font-size: 13px;
+            color: #94a3b8;
+            transition: all 0.15s ease;
+        }
+        .tka-row-toggle.is-checked {
+            background: #e0f2fe;
+        }
+        .tka-row-toggle.is-checked .tka-row-toggle-icon {
+            color: #0284c7;
+            font-weight: bold;
+        }
+
+        /* Action Buttons fading-in seamlessly on row hover */
+        .tka-row-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+            opacity: 0;
+            transform: translateX(4px);
+            transition: all 0.15s ease;
+        }
+        .tka-node-row:hover .tka-row-actions {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .tka-action-btn {
+            border: none !important;
+            background: transparent !important;
+            color: #94a3b8 !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            width: 26px !important;
             height: 26px !important;
+            border-radius: 6px !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            padding: 0 12px !important;
+            cursor: pointer !important;
             transition: all 0.15s ease !important;
+            padding: 0 !important;
+            box-shadow: none !important;
         }
-
-        .tka-node-item .btn-edit-node:hover {
-            background: #e2e8f0 !important;
-            color: #0f172a !important;
-            border-color: #94a3b8 !important;
-        }
-
-        .tka-node-item .btn-add-child {
+        .tka-action-btn:hover {
             background: #f1f5f9 !important;
             color: #334155 !important;
-            border: 1px solid #cbd5e1 !important;
-            box-shadow: none !important;
-            text-shadow: none !important;
-            transition: all 0.15s ease !important;
         }
-
-        .tka-node-item .btn-add-child:hover {
-            background: #e2e8f0 !important;
-            color: #0f172a !important;
-            border-color: #94a3b8 !important;
-        }
-
-        .tka-node-item .btn-delete-node.delete {
+        .tka-action-btn.btn-delete-node:hover {
             background: #fef2f2 !important;
             color: #ef4444 !important;
-            border: 1px solid #fee2e2 !important;
-            box-shadow: none !important;
-            text-shadow: none !important;
-            transition: all 0.15s ease !important;
         }
 
-        .tka-node-item .btn-delete-node.delete:hover {
-            background: #fee2e2 !important;
-            color: #dc2626 !important;
-            border-color: #fca5a5 !important;
+        /* High-precision guide line indicators for active drag-and-drop */
+        .tka-node-row.drag-over-before::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #3b82f6;
+            border-radius: 2px;
+            box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
+            z-index: 10;
+        }
+        .tka-node-row.drag-over-after::before {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #3b82f6;
+            border-radius: 2px;
+            box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
+            z-index: 10;
+        }
+        .tka-node-row.drag-over-inside {
+            background: #eff6ff !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
         }
 
         .tka-btn {
